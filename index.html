@@ -219,7 +219,7 @@ function renderGuide() {
   <p class="mute small" style="margin-bottom:12px">Une page web ne peut pas bloquer d’autres applis toute seule. On utilise donc l’automatisation de ton téléphone : quand tu ouvres une appli bloquée, il te renvoie ici tant que la séance du jour n’est pas validée. À faire une seule fois, environ 10 minutes.</p>
   <div class="note" style="margin-bottom:14px">⚠️ Ne bloque jamais : Safari ou Chrome (pour ouvrir cette page), Raccourcis ou MacroDroid, Téléphone et Messages.</div>
   <div class="tabs"><button data-t="ios" class="${gtab === 'ios' ? 'on' : ''}">🍎 iPhone</button><button data-t="android" class="${gtab === 'android' ? 'on' : ''}">🤖 Android</button></div>`;
-  const lockUrl = S.focusUrl ? S.focusUrl.split('#')[0] : url;
+  const lockUrl = S.focusUrl ? new URL(S.focusUrl.split('#')[0], location.href).href : url;
   if (gtab === 'ios') h += `
   <div class="card"><h3>1 · Le raccourci « ${SHORTCUT} »</h3><p class="small mute" style="margin-bottom:10px">Il reçoit un code du type <span class="mono">8B8686 ${dkey()} 17:30</span>, vérifie qu’il est authentique, puis te libère jusqu’à l’heure indiquée. Ouvre <b>Raccourcis</b> → <b>+</b>, nomme-le exactement <span class="mono">${SHORTCUT}</span>, puis ajoute :</p>
   <ol class="steps">
