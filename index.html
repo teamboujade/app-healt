@@ -114,7 +114,7 @@ const dkey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth() + 1) +
 const addDays = (k, n) => { const [y, m, d] = k.split('-').map(Number); return dkey(new Date(y, m - 1, d + n)); };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.pin) return s; } catch (e) {} return null; }
-let S = load() || { pin: String(Math.floor(100000 + Math.random() * 900000)), prog: { pompes: 20, abdos: 20, squats: 20 }, on: { pompes: true, abdos: true, squats: true }, hook: '', days: {}, lastUrgence: null, voice: true, seenGuide: false };
+let S = load() || { pin: String(Math.floor(100000 + Math.random() * 900000)), prog: { pompes: 20, abdos: 20, squats: 20 }, on: { pompes: true, abdos: true, squats: true }, hook: '', focusUrl: 'https://claude.ai/artifact/2B9FuQhEvQBeLW7eMLYLVB', days: {}, lastUrgence: null, voice: true, seenGuide: false };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 save();
 const today = () => { const k = dkey(); S.days[k] = S.days[k] || { reps: {} }; return S.days[k]; };
@@ -130,10 +130,14 @@ function streak() { let k = dkey(), n = 0; if (!(S.days[k] && S.days[k].unlocked
 async function unlockNow(urgence = false) {
   const d = today();
   if (!d.unlocked) { d.unlocked = true; d.urgence = urgence; d.at = Date.now(); save(); }
-  if (S.hook) { try { fetch(S.hook, { mode: 'no-cors' }); } catch (e) {} }
+  if (urgence) { const u = new Date(Date.now() + 3600e3); const until = u.getDate() !== new Date().getDate() ? '23:59' : pad(u.getHours()) + ':' + pad(u.getMinutes()); d.tok = await unlockToken(until); save(); }
+  if (S.hook && (!S.focusUrl || urgence)) { const t = urgence ? d.tok : await unlockToken(); try { fetch(S.hook + '?minutes=' + minsLeft(t.slice(-5)), { mode: 'no-cors' }); } catch (e) {} }
   render();
 }
-function iosLink(code) { return 'shortcuts://run-shortcut?name=' + encodeURIComponent(SHORTCUT) + '&input=text&text=' + encodeURIComponent(code); }
+function iosLink(txt) { return 'shortcuts://run-shortcut?name=' + encodeURIComponent(SHORTCUT) + '&input=text&text=' + encodeURIComponent(txt); }
+async function unlockToken(until = '23:59') { const tok = dkey() + ' ' + until; const c = await sha6(S.pin + '|' + tok); return c + ' ' + tok; }
+async function sha6(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('').slice(0, 6).toUpperCase(); }
+function minsLeft(until = '23:59') { const [h, m] = until.split(':').map(Number); const d = new Date(); return Math.max(1, h * 60 + m - d.getHours() * 60 - d.getMinutes()); }
 
 /* ---------- vues ---------- */
 const app = document.getElementById('app');
@@ -151,12 +155,13 @@ async function render() {
 async function renderHome() {
   const d = today(), done = allDone(), un = !!d.unlocked;
   const code = un ? await dayCode(S.pin, dkey()) : '';
+  const tok = un ? (d.urgence ? d.tok : await unlockToken()) : '';
   const st = streak();
   let h = `<div class="row" style="margin-bottom:14px"><div class="grow"><h1>Épopée Sport</h1><div class="small mute">Sport d’abord, écran ensuite.</div></div><a class="btn sm" href="#reglages">⚙️</a></div>`;
   if (un) {
-    h += `<div class="card lock on"><div class="ic">🔓</div><h2 style="margin:10px 0 4px">${d.urgence ? 'Déblocage d’urgence' : 'Téléphone débloqué'}</h2><p class="small mute">Jusqu’à minuit. Code du jour :</p><div class="code">${code}</div>
-      <a class="btn pri full" href="${iosLink(code)}">🍎 Débloquer mon iPhone</a>
-      ${S.hook ? `<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}" target="_blank" rel="noopener">🤖 Débloquer mon Android</a><p class="small dim" style="margin-top:6px">Android : le déblocage a déjà été envoyé automatiquement. Le bouton sert si ça n’a pas marché.</p>` : `<p class="small dim" style="margin-top:8px">Android : ajoute ton lien MacroDroid dans <a href="#installer">Installer le verrou</a>.</p>`}</div>`;
+    h += `<div class="card lock on"><div class="ic">🔓</div><h2 style="margin:10px 0 4px">${d.urgence ? 'Déblocage d’urgence' : 'Téléphone débloqué'}</h2>${S.focusUrl && !d.urgence ? `<p class="small mute" style="margin-bottom:12px">Séance validée. Épopée Focus calcule jusqu’à quand tu es libre, selon tes devoirs.</p><a class="btn pri full" href="${esc(S.focusUrl.split('#')[0])}#sport-${code}" target="_blank" rel="noopener">Continuer vers Focus →</a>` : `<p class="small mute">Jusqu’à ${esc(tok.slice(-5))}. Code :</p><div class="code">${tok.slice(0, 6)}</div><p class="small dim" style="margin-bottom:10px">${esc(tok)}</p>
+      <a class="btn pri full" href="${iosLink(tok)}">🍎 Débloquer mon iPhone</a>
+      ${S.hook ? `<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}?minutes=${minsLeft(tok.slice(-5))}" target="_blank" rel="noopener">🤖 Débloquer mon Android</a>` : `<p class="small dim" style="margin-top:8px">Android : ajoute ton lien MacroDroid dans <a href="#installer">Installer le verrou</a>.</p>`}`}</div>`;
   } else if (done) {
     h += `<div class="card lock on"><div class="ic">🏆</div><h2 style="margin:10px 0 6px">Séance validée !</h2><button class="btn ok full" id="doUnlock">Débloquer mon téléphone</button></div>`;
   } else {
@@ -194,12 +199,14 @@ function renderSettings() {
   for (const k in EXERCISES) h += `<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><label class="row grow" style="gap:8px"><input type="checkbox" data-on="${k}" ${S.on[k] ? 'checked' : ''} style="width:20px;height:20px">${EXERCISES[k].i} ${EXERCISES[k].n}</label><div class="num"><button data-dec="${k}">−</button><b>${S.prog[k]}</b><button data-inc="${k}">+</button></div></div>`;
   h += `<p class="note" style="margin-top:10px">Pour éviter de tricher, une séance déjà validée aujourd’hui n’est pas affectée : les changements comptent à partir de demain.</p></div>`;
   h += `<div class="card"><h3>Voix</h3><label class="row small"><input type="checkbox" id="voice" ${S.voice ? 'checked' : ''} style="width:20px;height:20px"> Compter les répétitions à voix haute</label></div>`;
-  h += `<div class="card"><h3>Code secret du verrou</h3><p class="small mute">Il sert à calculer le code du jour. Tu dois le taper à l’identique dans ton raccourci iPhone.</p><div class="code" style="font-size:30px">${S.pin}</div></div>`;
+  h += `<div class="card"><h3>Lien de ta page Focus (devoirs / travail)</h3><p class="small mute" style="margin-bottom:8px">Facultatif. S’il est rempli, après la séance tu es envoyé sur Focus, qui débloque jusqu’à ton prochain bloc de devoirs.</p><input id="focusUrl" placeholder="https://claude.ai/artifact/…" value="${esc(S.focusUrl)}"><button class="btn sm" id="saveFocus" style="margin-top:8px">Enregistrer</button></div>`;
+  h += `<div class="card"><h3>Code secret du verrou</h3><p class="small mute">Il sert à calculer les codes de déblocage. Tape-le à l’identique dans ton raccourci iPhone et dans les réglages de la page Focus.</p><div class="code" style="font-size:30px">${S.pin}</div></div>`;
   app.innerHTML = h;
   const d = today();
   app.querySelectorAll('[data-inc],[data-dec]').forEach(b => b.onclick = () => { const k = b.dataset.inc || b.dataset.dec; const step = b.dataset.inc ? 5 : -5; S.prog[k] = Math.max(5, Math.min(200, S.prog[k] + step)); if (d.unlocked) d.keep = true; save(); renderSettings(); });
   app.querySelectorAll('[data-on]').forEach(c => c.onchange = () => { S.on[c.dataset.on] = c.checked; if (!active().length) { S.on[c.dataset.on] = true; c.checked = true; toast('Garde au moins un exercice'); } save(); });
   document.getElementById('voice').onchange = e => { S.voice = e.target.checked; save(); };
+  document.getElementById('saveFocus').onclick = () => { const v = document.getElementById('focusUrl').value.trim(); if (v && !/^https:\/\//.test(v)) return toast('Colle un lien qui commence par https://'); S.focusUrl = v; save(); toast('Enregistré ✅'); };
 }
 
 let gtab = /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : /android/i.test(navigator.userAgent) ? 'android' : 'ios';
@@ -210,33 +217,34 @@ function renderGuide() {
   <p class="mute small" style="margin-bottom:12px">Une page web ne peut pas bloquer d’autres applis toute seule. On utilise donc l’automatisation de ton téléphone : quand tu ouvres une appli bloquée, il te renvoie ici tant que la séance du jour n’est pas validée. À faire une seule fois, environ 10 minutes.</p>
   <div class="note" style="margin-bottom:14px">⚠️ Ne bloque jamais : Safari ou Chrome (pour ouvrir cette page), Raccourcis ou MacroDroid, Téléphone et Messages.</div>
   <div class="tabs"><button data-t="ios" class="${gtab === 'ios' ? 'on' : ''}">🍎 iPhone</button><button data-t="android" class="${gtab === 'android' ? 'on' : ''}">🤖 Android</button></div>`;
+  const lockUrl = S.focusUrl ? S.focusUrl.split('#')[0] : url;
   if (gtab === 'ios') h += `
-  <div class="card"><h3>1 · Le raccourci « ${SHORTCUT} »</h3><p class="small mute" style="margin-bottom:10px">Il vérifie le code du jour et enregistre le déblocage. Ouvre l’app <b>Raccourcis</b> → <b>+</b>, nomme-le exactement <span class="mono">${SHORTCUT}</span>, puis ajoute ces actions :</p>
+  <div class="card"><h3>1 · Le raccourci « ${SHORTCUT} »</h3><p class="small mute" style="margin-bottom:10px">Il reçoit un code du type <span class="mono">8B8686 ${dkey()} 17:30</span>, vérifie qu’il est authentique, puis te libère jusqu’à l’heure indiquée. Ouvre <b>Raccourcis</b> → <b>+</b>, nomme-le exactement <span class="mono">${SHORTCUT}</span>, puis ajoute :</p>
   <ol class="steps">
-   <li><b>Recevoir</b> du <b>Texte</b> en entrée. Si aucune entrée : <b>Demander une entrée</b>.</li>
-   <li><b>Date actuelle</b>, puis <b>Formater la date</b> → format personnalisé <span class="mono">yyyy-MM-dd</span>.</li>
-   <li><b>Texte</b> : tape <span class="mono">${S.pin}|</span> puis insère la variable <b>Date formatée</b>. Ça donne <span class="mono">${S.pin}|${dkey()}</span>.</li>
-   <li><b>Générer un hash</b> (Hash) de type <b>SHA256</b> à partir du Texte.</li>
-   <li><b>Rechercher des correspondances</b> (Correspondre au texte) avec le motif <span class="mono">^.{6}</span> dans le Hash.</li>
-   <li><b>Changer la casse</b> des Correspondances en <b>MAJUSCULES</b>.</li>
-   <li><b>Si</b> l’<b>Entrée du raccourci</b> <b>est</b> le <b>Texte modifié</b> :<br>→ <b>Texte</b> avec la <b>Date formatée</b><br>→ <b>Enregistrer le fichier</b> dans <span class="mono">Raccourcis/epopee.txt</span>, sans demander où enregistrer, avec <b>Remplacer</b> activé<br>→ <b>Afficher la notification</b> « Téléphone débloqué 💪 ».</li>
+   <li>Dans les réglages du raccourci (ⓘ), active <b>Recevoir du texte</b>. Si aucune entrée : <b>Obtenir le presse-papiers</b>.</li>
+   <li><b>Séparer le texte</b> (l’Entrée du raccourci) par <b>Espaces</b>.</li>
+   <li><b>Obtenir l’élément de la liste</b> → <b>Premier élément</b>, puis <b>Définir la variable</b> <span class="mono">Code</span>.</li>
+   <li><b>Obtenir des éléments de la liste</b> (Texte séparé) → <b>Éléments de la plage</b> 2 à 3, puis <b>Combiner le texte</b> avec <b>Espaces</b>, puis <b>Définir la variable</b> <span class="mono">Jeton</span>.</li>
+   <li><b>Texte</b> : tape <span class="mono">${S.pin}|</span> puis insère la variable <b>Jeton</b>.</li>
+   <li><b>Générer un hash</b> <b>SHA256</b> du Texte, puis <b>Rechercher des correspondances</b> avec <span class="mono">^.{6}</span>, puis <b>Changer la casse</b> en <b>MAJUSCULES</b>.</li>
+   <li><b>Si</b> la variable <b>Code</b> <b>est</b> le <b>Texte modifié</b> : <b>Enregistrer le fichier</b> (contenu : <b>Jeton</b>) dans <span class="mono">Raccourcis/epopee.txt</span>, sans demander où enregistrer, avec <b>Remplacer</b> activé, puis <b>Afficher la notification</b> « Libre jusqu’à [Jeton] 💪 ».</li>
    <li><b>Sinon</b> → <b>Afficher l’alerte</b> « Code invalide ».</li>
   </ol></div>
-  <div class="card"><h3>2 · Le raccourci « Epopee Verrou »</h3><p class="small mute" style="margin-bottom:10px">Il s’exécute quand tu ouvres une appli bloquée.</p>
+  <div class="card"><h3>2 · Le raccourci « Epopee Verrou »</h3>
   <ol class="steps">
-   <li><b>Date actuelle</b> → <b>Formater la date</b> au format <span class="mono">yyyy-MM-dd</span>.</li>
    <li><b>Obtenir le fichier</b> <span class="mono">Raccourcis/epopee.txt</span>, avec « Erreur si introuvable » <b>désactivé</b>.</li>
-   <li><b>Obtenir le texte de l’entrée</b> à partir du Fichier.</li>
-   <li><b>Si</b> le Texte <b>est</b> la <b>Date formatée</b> → <b>Arrêter ce raccourci</b>.</li>
-   <li><b>Fin du Si</b>, puis <b>Ouvrir les URL</b> : <span class="mono">${esc(url)}</span></li>
-  </ol></div>
+   <li><b>Obtenir le texte de l’entrée</b> (le Fichier), puis <b>Obtenir les dates de l’entrée</b>.</li>
+   <li><b>Date actuelle</b>.</li>
+   <li><b>Si</b> la <b>Date actuelle</b> <b>est avant</b> les <b>Dates</b> → <b>Arrêter ce raccourci</b>. <b>Fin du Si</b>.</li>
+   <li><b>Ouvrir les URL</b> : <span class="mono">${esc(lockUrl)}</span></li>
+  </ol>${S.focusUrl ? '' : '<p class="small dim">Tu utilises aussi la page Focus (devoirs) ? Colle son lien dans les Réglages : cette adresse sera mise à jour.</p>'}</div>
   <div class="card"><h3>3 · L’automatisation</h3><ol class="steps">
    <li>Raccourcis → onglet <b>Automatisation</b> → <b>+</b> → <b>App</b>.</li>
    <li><b>Choisir</b> toutes les applis à bloquer (TikTok, Instagram, YouTube, Snapchat, jeux…), cocher <b>Est ouverte</b>.</li>
    <li>Sélectionner <b>Exécuter immédiatement</b> et désactiver « Avertir lors de l’exécution ».</li>
    <li>Action : <b>Exécuter le raccourci</b> → <b>Epopee Verrou</b>.</li>
   </ol></div>
-  <div class="card"><h3>4 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois atterrir ici. Fais ta séance, puis touche « Débloquer mon iPhone ». Ton téléphone est libre jusqu’à minuit.</p>
+  <div class="card"><h3>4 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois atterrir sur la page du verrou. Fais ta séance, touche « Débloquer mon iPhone » : tu es libre jusqu’à l’heure affichée.</p>
   <p class="note" style="margin-top:10px">💡 Ajoute cette page à ton écran d’accueil : Safari → Partager → « Sur l’écran d’accueil ».</p></div>`;
   else h += `
   <div class="card"><h3>1 · Installe MacroDroid</h3><p class="small mute">Gratuit sur le Play Store, et la version gratuite suffit pour les 3 macros. Accepte les autorisations qu’il demande, notamment l’accessibilité et l’affichage par-dessus les autres applis.</p></div>
@@ -244,18 +252,21 @@ function renderGuide() {
   <div class="card"><h3>3 · Macro « Verrou »</h3><ol class="steps">
    <li>Déclencheur : <b>Application lancée/fermée</b> → <b>Lancée</b> → choisis toutes les applis à bloquer.</li>
    <li>Contrainte : <b>Valeur de variable</b> → <span class="mono">epopee_ok</span> = <b>faux</b>.</li>
-   <li>Action 1 : <b>Écran d’accueil</b> (Lancer l’écran d’accueil).</li>
-   <li>Action 2 : <b>Ouvrir une page web</b> → <span class="mono">${esc(url)}</span></li>
+   <li>Action 1 : <b>Écran d’accueil</b>.</li>
+   <li>Action 2 : <b>Ouvrir une page web</b> → <span class="mono">${esc(lockUrl)}</span></li>
   </ol></div>
   <div class="card"><h3>4 · Macro « Débloquer »</h3><ol class="steps">
-   <li>Déclencheur : <b>Webhook (URL)</b>. Identifiant : <span class="mono">epopee</span>. MacroDroid te donne un lien qui commence par <span class="mono">https://trigger.macrodroid.com/</span>. Copie-le.</li>
-   <li>Action : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>vrai</b>, puis <b>Afficher une notification</b> « Téléphone débloqué 💪 ».</li>
+   <li>Déclencheur : <b>Webhook (URL)</b>, identifiant <span class="mono">epopee</span>. Copie le lien donné (<span class="mono">https://trigger.macrodroid.com/…</span>).</li>
+   <li>Action 1 : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>vrai</b>, puis <b>Afficher une notification</b> « Téléphone débloqué 💪 ».</li>
+   <li>Action 2 : <b>Attendre avant la prochaine action</b>, en utilisant le paramètre <span class="mono">minutes</span> envoyé dans le lien (option « utiliser une variable »).</li>
+   <li>Action 3 : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>faux</b>.</li>
    <li>Colle le lien ici :</li></ol>
-   <input id="hook" placeholder="https://trigger.macrodroid.com/…" value="${esc(S.hook)}"><button class="btn sm" id="saveHook" style="margin-top:8px">Enregistrer le lien</button></div>
+   <input id="hook" placeholder="https://trigger.macrodroid.com/…" value="${esc(S.hook)}"><button class="btn sm" id="saveHook" style="margin-top:8px">Enregistrer le lien</button>
+   <p class="small dim" style="margin-top:8px">Si ton MacroDroid ne propose pas d’attente variable, garde seulement l’action 1 : tu seras débloqué jusqu’à minuit.</p></div>
   <div class="card"><h3>5 · Macro « Minuit »</h3><ol class="steps">
    <li>Déclencheur : <b>Jour/Heure</b> → 00:00, tous les jours.</li>
    <li>Action : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>faux</b>.</li></ol></div>
-  <div class="card"><h3>6 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois revenir ici. Une fois la séance validée, la page envoie le déblocage toute seule.</p></div>`;
+  <div class="card"><h3>6 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois revenir sur la page du verrou. Une fois la séance validée, le déblocage est envoyé.</p></div>`;
   h += `<a class="btn pri full" href="#accueil" style="margin-top:16px">C’est installé → ma séance</a>`;
   app.innerHTML = h;
   app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { gtab = b.dataset.t; renderGuide(); });
