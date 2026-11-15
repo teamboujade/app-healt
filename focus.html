@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Épopée Focus — devoirs et travail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#100f1c;--bg2:#16152a;--panel:#1d1b33;--panel2:#25223f;--line:#35315a;--ink:#f3efe6;--mute:#a29cc0;--dim:#6f6990;
+--gold:#ffcc4d;--xp:#5be37d;--mana:#4dc9ff;--hp:#ff5c7a;--ember:#ff8a3d;--chaos:#b46bff;--px:'Pixelify Sans',ui-monospace,monospace;--tx:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--tx);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(1000px 420px at 50% -180px,#1f2f50,transparent 70%),var(--bg)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg2);border:2px solid var(--line);border-radius:7px;padding:9px 11px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--mana)}
+a{color:var(--mana)}
+.app{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(96px + env(safe-area-inset-bottom))}
+h1,h2,h3,.px{font-family:var(--px);font-weight:700;letter-spacing:.3px}
+h1{font-size:20px;white-space:nowrap}h2{font-size:18px;margin:22px 2px 10px;display:flex;align-items:center;gap:8px}h2 small{font-family:var(--tx);font-weight:500;font-size:12px;color:var(--mute);margin-left:auto}
+h3{font-size:16px;margin-bottom:6px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:11px;padding:14px;box-shadow:0 4px 0 #0a0914}
+.card+.card{margin-top:10px}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}.wrap{flex-wrap:wrap}
+.mute{color:var(--mute)}.dim{color:var(--dim)}.small{font-size:13px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 7px;border-radius:4px;background:var(--panel2);color:var(--mute);white-space:nowrap}
+.btn{font-family:var(--px);font-weight:700;font-size:15px;padding:10px 15px;border-radius:8px;background:var(--panel2);border:2px solid var(--line);box-shadow:0 3px 0 #0a0914;text-align:center;display:inline-block;text-decoration:none;color:var(--ink)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0a0914}
+.btn.pri{background:var(--gold);color:#2a1d00;border-color:#ffe08a;box-shadow:0 3px 0 #a87b12}
+.btn.ok{background:var(--xp);color:#062512;border-color:#9ff2b4;box-shadow:0 3px 0 #2a8c47}
+.btn.bad{background:transparent;color:var(--hp);border-color:#5a2a3a}
+.btn.full{width:100%;display:block}.btn.sm{font-size:13px;padding:6px 10px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.modes{display:flex;background:var(--bg2);border:2px solid var(--line);border-radius:9px;padding:3px}
+.modes button{padding:6px 12px;border-radius:6px;font-family:var(--px);font-size:14px;color:var(--dim)}
+.modes button.on{background:var(--gold);color:#2a1d00}
+.lock{text-align:center;padding:20px 14px}
+.lock .ic{font-size:48px;line-height:1}
+.lock.on{border-color:#2b6b45;background:linear-gradient(180deg,#183327,var(--panel))}
+.lock.off{border-color:#5a2a3a;background:linear-gradient(180deg,#2c1624,var(--panel))}
+.code{font-family:var(--px);font-size:34px;letter-spacing:6px;text-align:center;color:var(--gold);margin:6px 0 4px}
+.bloc{display:flex;gap:12px;align-items:flex-start}
+.bloc .t{font-family:var(--px);font-size:14px;width:52px;flex:none;color:var(--mute);padding-top:2px;line-height:1.2}
+.bloc.ev{opacity:.75}
+.bloc.valid{border-color:#2b5a3c}
+.bloc.now{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,204,77,.15),0 4px 0 #0a0914}
+.bloc.late{border-color:var(--hp)}
+.st{font-size:11.5px;padding:2px 7px;border-radius:4px;font-weight:700}
+.st.todo{background:#2a2412;color:var(--gold)}.st.valid{background:#173a24;color:var(--xp)}.st.refused{background:#3a1622;color:var(--hp)}.st.late{background:#3a1622;color:var(--hp)}
+.steps{margin:6px 0 0 18px;font-size:13px;color:var(--mute)}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(16,15,28,.95);backdrop-filter:blur(8px);border-top:2px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:20}
+nav .in{max-width:600px;margin:0 auto;display:flex}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:8px;color:var(--dim);font-family:var(--px);font-size:12px}
+nav button b{font-size:20px;font-weight:400;filter:grayscale(1) opacity(.6)}
+nav button.on{color:var(--gold);background:var(--panel)}nav button.on b{filter:none}
+.scrim{position:fixed;inset:0;background:rgba(5,4,12,.75);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{background:var(--panel);border:2px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;width:100%;max-width:600px;max-height:92vh;overflow:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+@media(min-width:640px){.scrim{align-items:center}.sheet{border-radius:14px;border-bottom:2px solid var(--line)}}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;color:var(--mute);margin-bottom:5px;font-weight:500}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.note{background:#1a1830;border-left:3px solid var(--gold);padding:10px 12px;border-radius:6px;font-size:13px;color:var(--mute)}
+.note.warn{border-color:var(--hp)}.note.ok{border-color:var(--xp)}
+.thinking{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:14px}
+.thinking i{width:10px;height:10px;background:var(--gold);border-radius:2px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+.day{font-family:var(--px);font-size:14px;color:var(--gold);margin:16px 2px 6px;text-transform:capitalize}
+.ev{font-size:13px;color:var(--mute);padding:5px 0;border-bottom:1px dashed var(--line);display:flex;gap:8px}
+.ev:last-child{border:0}
+.ev b{font-family:var(--px);color:var(--ink);font-weight:500;width:96px;flex:none}
+.task{display:flex;gap:10px;align-items:flex-start}
+.task.done .ttl{text-decoration:line-through;color:var(--dim)}
+.chk{width:26px;height:26px;border-radius:6px;border:2px solid var(--line);background:#0e0d1b;flex:none;display:grid;place-items:center;color:#062512;font-weight:700}
+.task.done .chk{background:var(--xp);border-color:var(--xp)}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--mute);font-size:14px;cursor:pointer;display:block}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:2px solid var(--line)}
+#toast{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%);background:#0b0a16;border:2px solid var(--line);padding:9px 16px;border-radius:9px;font-family:var(--px);z-index:80;display:none;max-width:92vw;text-align:center}
+.hold{position:relative;overflow:hidden}.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ff8a3d55}
+</style>
+</head>
+<body>
+<div class="app"><header id="top"></header><main id="main"></main></div>
+<nav><div class="in" id="nav"></div></nav>
+<div id="modal"></div><div id="toast"></div>
+<script>
+"use strict";
+/* ========== outils ========== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const pad=n=>String(n).padStart(2,'0');
+const dkey=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseD=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(k,n)=>{const d=parseD(k);d.setDate(d.getDate()+n);return dkey(d)};
+const wd=k=>(parseD(k).getDay()+6)%7; // 0 = lundi
+const JOURS=['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const toMin=t=>{const m=/^(\d{1,2})[:h](\d{2})/.exec(String(t||''));return m?(+m[1])*60+(+m[2]):null};
+const toHM=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60);
+const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const dayLabel=k=>{const t=dkey();if(k===t)return'aujourd’hui';if(k===addDays(t,1))return'demain';const d=parseD(k);return JOURS[wd(k)]+' '+d.getDate()+'/'+pad(d.getMonth()+1)};
+function toast(m,ms=2800){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
+function openModal(h){$('#modal').innerHTML=`<div class="scrim" data-a="scrim"><div class="sheet">${h}</div></div>`}
+function closeModal(){$('#modal').innerHTML=''}
+async function sha6(text){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,6).toUpperCase()}
+
+/* ========== libellés École / Travail ========== */
+const L={
+ ecole:{name:'École',ic:'🎒',tasks:'Devoirs',task:'devoir',taskIc:'📚',event:'cours',events:'Emploi du temps',importTasks:'Captures de Pronote, Classroom, ENT ou ton agenda',proofHint:'Prends en photo ta copie, ton cahier ou ton exercice terminé.',subj:'Matière'},
+ travail:{name:'Travail',ic:'💼',tasks:'Missions',task:'mission',taskIc:'🗂️',event:'réunion',events:'Planning de travail',importTasks:'Captures de ta to-do, tes mails, Trello, Notion, Teams…',proofHint:'Prends en photo ou fais une capture du travail terminé (document, écran, livrable).',subj:'Projet'}
+};
+
+/* ========== état & sauvegarde ========== */
+const DEV=uid();
+function fresh(){return{v:1,mode:'ecole',pin:'',sportUrl:/github\.io$/.test(location.hostname)?'./':'https://teamboujade.github.io/app-healt/',needSport:true,hook:'',apiKey:'',
+ prof:{wake:'07:00',sleep:'22:30',commute:30,maxBloc:50,notes:''},
+ data:{ecole:{events:[],tasks:[],blocs:[]},travail:{events:[],tasks:[],blocs:[]}},
+ sport:{},urg:null,setup:false,_at:0}}
+let S=null,tab='today';
+const M=()=>S.data[S.mode], LB=()=>L[S.mode];
+const Store={db:null,ref:null,mode:'local',writing:false,dirty:false,timer:null,
+ async init(){let db=null,user=null;try{if(typeof claude!=='undefined'&&claude&&claude.use){const t=new Promise(r=>setTimeout(()=>r([null,null]),10000));[db,user]=await Promise.race([Promise.all([claude.use('db'),claude.use('user')]),t])}}catch(e){}
+  let id=null;if(db&&user){try{id=await user.id()}catch(e){}}
+  if(db&&id){this.db=db;this.mode='cloud';this.ref=db.doc('data/users/'+id+'/focus');
+   try{const s=await Promise.race([this.ref.get(),new Promise((_,j)=>setTimeout(()=>j(0),10000))]);if(s.exists&&s.data().s)return JSON.parse(s.data().s);return this.local()}catch(e){this.mode='local';return this.local()}}
+  return this.local()},
+ local(){try{const r=localStorage.getItem('epopee_focus');return r?JSON.parse(r):null}catch(e){return null}},
+ save(){S._at=Date.now();try{localStorage.setItem('epopee_focus',JSON.stringify(S))}catch(e){}if(this.mode!=='cloud')return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.flush(),1000)},
+ async flush(){this.timer=null;if(this.writing){this.dirty=true;return}this.writing=true;this.dirty=false;try{await this.ref.set({s:JSON.stringify(S),at:S._at,dev:DEV})}catch(e){if(e&&e.code==='unavailable')setTimeout(()=>this.flush(),2000)}this.writing=false;if(this.dirty)this.flush()},
+ watch(){if(this.mode!=='cloud')return;this.ref.onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();if(!d||d.dev===DEV)return;if((d.at||0)>(S._at||0)&&!this.writing&&!this.timer){try{S=norm(JSON.parse(d.s));render()}catch(e){}}},()=>{})}};
+function norm(s){const f=fresh();for(const k in f)if(s[k]===undefined)s[k]=f[k];for(const m of['ecole','travail'])s.data[m]=Object.assign({events:[],tasks:[],blocs:[]},s.data[m]||{});s.prof=Object.assign(f.prof,s.prof||{});return s}
+const save=()=>Store.save();
+
+/* ========== IA (Claude) ========== */
+let AI=null,AIimg=0;
+let NATIVE=null;
+async function initAI(){try{if(typeof claude!=='undefined'&&claude&&claude.use){NATIVE=await claude.use('sample');if(NATIVE){const l=await NATIVE.limits().catch(()=>null);AIimg=l&&l.images?l.images.maxCount:0}}}catch(e){NATIVE=null}
+ if(NATIVE){AI={json:(p,o)=>NATIVE.json(p,o)};return}
+ setApiAI()}
+function setApiAI(){if(S&&S.apiKey){AI={json:apiJson};AIimg=5}else{AI=null;AIimg=0}}
+async function shrink(file){ // réduit l'image (≤1568 px, JPEG) avant envoi
+ const url=URL.createObjectURL(file);try{const img=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=url});
+  const k=Math.min(1,1568/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85).split(',')[1]}finally{URL.revokeObjectURL(url)}}
+async function apiJson(prompt,o={}){
+ const files=o.images?[...(o.images.length!==undefined?o.images:[o.images])]:[];
+ const content=[];for(const f of files.slice(0,5)){try{content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await shrink(f)}})}catch(e){throw{code:'image_rejected'}}}
+ content.push({type:'text',text:prompt+'\n\nRéponds uniquement avec le JSON demandé, sans aucun texte autour.'});
+ let r;try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+  body:JSON.stringify({model:o.modelTier==='complex'?'claude-opus-5-5':'claude-sonnet-5-5',max_tokens:8000,messages:[{role:'user',content}]})})}catch(e){throw{code:'upstream_error'}}
+ if(r.status===401)throw{code:'bad_key'};if(r.status===429)throw{code:'rate_limited'};if(r.status===400&&files.length)throw{code:'image_rejected'};if(!r.ok)throw{code:'upstream_error'};
+ const d=await r.json();const txt=(d.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+ const tries=[txt,(/```(?:json)?\s*([\s\S]*?)```/.exec(txt)||[])[1],txt.slice(Math.min(...['{','['].map(c=>txt.indexOf(c)).filter(i=>i>=0)),Math.max(txt.lastIndexOf('}'),txt.lastIndexOf(']'))+1)];
+ for(const t of tries){if(!t)continue;try{return JSON.parse(t)}catch(e){}}throw{code:'invalid_json'}}
+function aiErr(e){const c=e&&e.code;return c==='not_granted'?'Tu as refusé l’accès à Claude pour cette page.':c==='rate_limited'?'Trop de demandes : réessaie dans un moment.':c==='image_rejected'?'Image refusée : essaie une autre photo (JPEG ou PNG).':c==='images_unavailable'?'Les images ne sont pas disponibles ici.':c==='invalid_json'?'Réponse illisible, réessaie.':c==='refused'?'Claude a refusé cette demande.':c==='bad_key'?'Clé API invalide : vérifie-la dans les Réglages.':'Erreur de l’IA, réessaie.'}
+function thinking(msg){return `<div class="thinking"><i></i>${esc(msg)}</div>`}
+
+async function aiSchedule(files,text){
+ const p=`Tu lis l’emploi du temps hebdomadaire ${S.mode==='ecole'?'scolaire (cours)':'de travail (heures de travail, réunions)'} d’une personne.
+${files.length?'Les images jointes sont des captures de son emploi du temps.':''}${text?'\nTexte fourni par la personne :\n"""'+text.slice(0,6000)+'"""':''}
+Extrais chaque créneau récurrent de la semaine. Réponds UNIQUEMENT par un tableau JSON d’objets :
+{"day":0-6 (0=lundi … 6=dimanche),"start":"HH:MM","end":"HH:MM","title":"matière ou activité","kind":"${S.mode==='ecole'?'cours':'travail'}"|"activite"|"trajet"}
+Exemple : [{"day":0,"start":"08:00","end":"09:00","title":"Maths","kind":"cours"}]. Fusionne les heures consécutives de la même matière. Ignore ce qui n’est pas un créneau.`;
+ return AI.json(p,{images:files.length?files:undefined,modelTier:'default'});
+}
+async function aiTasks(files,text){
+ const t=dkey();
+ const p=`Aujourd’hui : ${JOURS[wd(t)]} ${t}. Tu lis la liste ${S.mode==='ecole'?'des devoirs d’un élève (Pronote, Google Classroom, ENT, agenda)':'des tâches de travail d’une personne'}.
+${files.length?'Les images jointes sont des captures.':''}${text?'\nTexte fourni :\n"""'+text.slice(0,6000)+'"""':''}
+Extrais chaque ${LB().task} à faire. Réponds UNIQUEMENT par un tableau JSON :
+{"title":"intitulé court et concret","subject":"${LB().subj.toLowerCase()}","due":"YYYY-MM-DD (date limite ; si seul le jour est indiqué, prends la prochaine occurrence)","est":minutes estimées pour une personne motivée (multiple de 5),"details":"consignes utiles, pages, numéros d’exercices"}
+N’invente rien. Ignore ce qui est déjà marqué comme fait.`;
+ return AI.json(p,{images:files.length?files:undefined,modelTier:'default'});
+}
+async function aiPlan(){
+ const t=dkey(),days=[...Array(7)].map((_,i)=>addDays(t,i));
+ const m=M(),pr=S.prof;
+ const fixed=m.blocs.filter(b=>b.status==='valid'&&b.date>=t).map(b=>({date:b.date,start:b.start,end:b.end,title:b.title}));
+ const todo=m.tasks.filter(x=>!x.done);
+ const p=`Tu es un coach d’organisation. Construis le planning de ${S.mode==='ecole'?'devoirs':'travail personnel'} pour les 7 prochains jours.
+Maintenant : ${JOURS[wd(t)]} ${t}, ${toHM(nowMin())}.
+Jours à planifier : ${days.map(d=>d+' ('+JOURS[wd(d)]+')').join(', ')}.
+Réveil ${pr.wake}, coucher ${pr.sleep}. Trajet : ${pr.commute} min avant et après les ${LB().event}s.${pr.notes?' Contraintes de la personne : '+pr.notes.slice(0,600):''}
+Créneaux occupés chaque semaine (day 0=lundi) : ${JSON.stringify(m.events.map(e=>({day:e.day,start:e.start,end:e.end,title:e.title})))}
+Blocs déjà validés à garder tels quels : ${JSON.stringify(fixed)}
+${LB().tasks} à placer : ${JSON.stringify(todo.map(x=>({id:x.id,title:x.title,subject:x.subject,due:x.due,est:x.est,details:(x.details||'').slice(0,200)})))}
+Règles :
+- Pas de bloc pendant les créneaux occupés, les trajets, dans les 45 min après le réveil ni dans l’heure avant le coucher.
+- Aujourd’hui, aucun bloc avant ${toHM(Math.min(nowMin()+15,23*60))}.
+- Blocs de 20 à ${pr.maxBloc} min ; découpe les gros ${LB().task}s en plusieurs blocs. Au moins 10 min de pause entre deux blocs. 3 à 4 blocs maximum par jour.
+- Chaque ${LB().task} est fini avant sa date limite, idéalement la veille. Les plus urgents d’abord.
+- Pour chaque bloc, donne 1 à 3 étapes concrètes et la preuve photo attendue à la fin (ce qu’on doit voir sur la photo).
+Réponds UNIQUEMENT par un tableau JSON :
+{"date":"YYYY-MM-DD","start":"HH:MM","end":"HH:MM","taskId":"id du ${LB().task}","title":"titre court","steps":["…"],"proof":"ce que la photo doit montrer"}`;
+ return AI.json(p,{modelTier:'complex'});
+}
+async function aiCheck(b,files){
+ const task=M().tasks.find(x=>x.id===b.taskId);
+ const p=`Tu vérifies, de façon juste mais exigeante, si une personne a vraiment fait son bloc de ${S.mode==='ecole'?'devoirs':'travail'}. Elle t’envoie ${files.length} photo(s) prise(s) à l’instant.
+Bloc : "${b.title}" (${b.start}–${b.end}).${task?' '+LB().task+' : '+task.title+(task.details?' — '+task.details.slice(0,300):''):''}
+Étapes prévues : ${(b.steps||[]).join(' ; ')}
+Preuve attendue : ${b.proof||'le travail terminé'}
+Valide si les photos montrent clairement un travail réel et cohérent avec le bloc (écrit à la main, document, écran de travail…), en quantité raisonnable pour la durée. Refuse si c’est hors sujet, vide, flou au point d’être illisible, une photo d’écran de réseau social, un cahier vierge, ou manifestement une ancienne copie sans rapport.
+Réponds UNIQUEMENT par un objet JSON : {"valid":true|false,"confidence":0 à 1,"feedback":"1 à 2 phrases en tutoyant : ce qui est bien ou ce qui manque","seen":"ce que tu vois sur la photo en une phrase"}`;
+ return AI.json(p,{images:files,modelTier:'default',cache:false});
+}
+
+/* ========== verrou : jetons horodatés ========== */
+function todayBlocs(){const t=dkey();return M().blocs.filter(b=>b.date===t).sort((a,b)=>toMin(a.start)-toMin(b.start))}
+function blocState(b){const t=dkey(),n=nowMin();if(b.status==='valid')return'valid';if(b.date<t||(b.date===t&&toMin(b.end)<=n))return'late';if(b.date===t&&toMin(b.start)<=n)return'now';return'todo'}
+function lockStatus(){
+ const t=dkey(),n=nowMin(),bl=todayBlocs();
+ const sl0=toMin(S.prof.sleep)??1350,wk0=toMin(S.prof.wake)??420;
+ if(n>=sl0||n<wk0)return{locked:true,why:'night'};
+ const late=bl.filter(b=>blocState(b)==='late');
+ const cur=bl.find(b=>blocState(b)==='now');
+ if(cur)return{locked:true,why:'bloc',bloc:cur};
+ if(late.length)return{locked:true,why:'late',bloc:late[0]};
+ if(S.needSport&&!S.sport[t])return{locked:true,why:'sport'};
+ const sl=toMin(S.prof.sleep)??1350;
+ const next=bl.find(b=>blocState(b)==='todo');
+ let until=Math.min(next?toMin(next.start):sl,sl);
+ if(until-n<3)return{locked:true,why:next?'soon':'night',bloc:next};
+ return{locked:false,until,next}}
+function tokenFor(untilMin){return dkey()+' '+toHM(untilMin)}
+async function unlockText(untilMin){const tok=tokenFor(untilMin);return (await sha6(S.pin+'|'+tok))+' '+tok}
+
+/* ========== rendu ========== */
+function renderTop(){
+ $('#top').innerHTML=`<div class="row"><div class="grow"><h1>Épopée Focus</h1><div class="small mute">${LB().ic} ${S.mode==='ecole'?'Devoirs d’abord, écran ensuite.':'Le travail d’abord, l’écran ensuite.'} · <a href="${esc(S.sportUrl)}">🏋️ Sport</a></div></div>
+ <div class="modes">${['ecole','travail'].map(m=>`<button class="${S.mode===m?'on':''}" data-a="mode" data-id="${m}">${L[m].ic} ${L[m].name}</button>`).join('')}</div></div>`}
+function renderNav(){const T=[['today','⏳','Maintenant'],['plan','🗓️','Planning'],['tasks',LB().taskIc,LB().tasks],['edt','🕘','Horaires'],['set','⚙️','Réglages']];
+ $('#nav').innerHTML=T.map(([k,i,n])=>`<button class="${tab===k?'on':''}" data-a="tab" data-id="${k}"><b>${i}</b>${n}</button>`).join('')}
+async function renderToday(){
+ if(!S.setup)return renderWelcome();
+ const ls=lockStatus();let h='';
+ if(!ls.locked){
+  const txt=await unlockText(ls.until);
+  h+=`<div class="card lock on"><div class="ic">🔓</div><h2 style="justify-content:center;margin:8px 0 2px">Téléphone libre jusqu’à ${toHM(ls.until)}</h2><p class="small mute">${ls.next?'Prochain bloc : '+esc(ls.next.title):'Ensuite c’est l’heure de dormir 😴'}</p>
+  <div class="code">${txt.slice(0,6)}</div><p class="small dim" style="margin-bottom:12px">${esc(txt)}</p>
+  <div class="row"><button class="btn pri grow" data-a="copy" data-id="${esc(txt)}">1. Copier le code</button><a class="btn grow" href="shortcuts://run-shortcut?name=Epopee%20Debloquer&input=clipboard">2. 🍎 Débloquer</a></div>
+  ${S.hook?`<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}?minutes=${Math.max(1,ls.until-nowMin())}" target="_blank" rel="noopener">🤖 Débloquer mon Android</a>`:''}
+  <p class="small dim" style="margin-top:8px">Si le bouton 🍎 ne s’ouvre pas : copie le code, puis lance « Epopee Debloquer » depuis l’app Raccourcis.</p></div>`;
+ }else{
+  const W={bloc:['📖','Bloc en cours',`C’est l’heure de : <b>${esc(ls.bloc&&ls.bloc.title)}</b>. Fais-le, puis envoie ta preuve.`],
+   late:['⏰','Bloc non validé',`Le bloc <b>${esc(ls.bloc&&ls.bloc.title)}</b> est passé sans preuve. Termine-le et envoie la photo pour débloquer.`],
+   sport:['🏋️','Sport d’abord','Fais ta séance du jour sur la page Sport pour débloquer ton temps libre.'],
+   soon:['⏳','Bloc imminent',`Ton bloc <b>${esc(ls.bloc&&ls.bloc.title)}</b> commence à ${esc(ls.bloc&&ls.bloc.start)}. Prépare tes affaires.`],
+   night:['🌙','Heure de dormir','Le téléphone reste verrouillé jusqu’à demain. Bonne nuit !']}[ls.why];
+  h+=`<div class="card lock off"><div class="ic">${W[0]}</div><h2 style="justify-content:center;margin:8px 0 4px">${W[1]}</h2><p class="small mute">${W[2]}</p>
+  ${ls.why==='sport'?`<a class="btn pri full" style="margin-top:12px" href="${esc(S.sportUrl)}" target="_blank" rel="noopener">Aller à la page Sport</a><p class="small dim" style="margin-top:8px">Une fois la séance validée, la page Sport te renvoie ici automatiquement.</p>`:''}
+  ${ls.bloc&&(ls.why==='bloc'||ls.why==='late')?`<button class="btn ok full" style="margin-top:12px" data-a="proof" data-id="${ls.bloc.id}">📸 J’ai fini : envoyer ma preuve</button>`:''}</div>`;
+ }
+ // timeline du jour
+ const t=dkey(),evs=M().events.filter(e=>e.day===wd(t)),bl=todayBlocs();
+ const items=[...evs.map(e=>({k:'ev',s:toMin(e.start),e})),...bl.map(b=>({k:'b',s:toMin(b.start),b}))].sort((a,b)=>a.s-b.s);
+ h+=`<h2>📅 Aujourd’hui <small>${JOURS[wd(t)]}</small></h2>`;
+ if(!items.length)h+=`<div class="card small mute">Rien de prévu aujourd’hui. ${M().tasks.some(x=>!x.done)?'<button class="btn sm pri" data-a="tab" data-id="plan">Générer le planning</button>':''}</div>`;
+ for(const it of items){
+  if(it.k==='ev'){h+=`<div class="card bloc ev"><div class="t">${esc(it.e.start)}<br><span class="dim">${esc(it.e.end)}</span></div><div class="grow"><b>${esc(it.e.title)}</b> <span class="tag">${esc(it.e.kind||LB().event)}</span></div></div>`;continue}
+  h+=blocCard(it.b)}
+ const urgOk=!S.urg||addDays(S.urg,7)<=t;
+ if(ls.locked&&ls.why!=='night')h+=`<h2>🆘 Urgence</h2><div class="card"><p class="small mute" style="margin-bottom:10px">Besoin vital du téléphone ? Une heure de déblocage, une fois par semaine.</p>${urgOk?`<button class="btn full hold" id="urg"><i></i><span>Maintiens 5 secondes</span></button>`:`<p class="small dim">Prochaine urgence possible le ${addDays(S.urg,7).split('-').reverse().join('/')}.</p>`}</div>`;
+ $('#main').innerHTML=h;
+ const u=$('#urg');if(u)holdBtn(u,5000,async()=>{S.urg=t;save();const until=Math.min(nowMin()+60,24*60-1);const txt=await unlockText(until);openModal(`<h3>🆘 Déblocage d’urgence</h3><p class="small mute">Valable jusqu’à ${toHM(until)}.</p><div class="code">${txt.slice(0,6)}</div><p class="small dim" style="text-align:center;margin-bottom:12px">${esc(txt)}</p><div class="row"><button class="btn pri grow" data-a="copy" data-id="${esc(txt)}">Copier</button><a class="btn grow" href="shortcuts://run-shortcut?name=Epopee%20Debloquer&input=clipboard">🍎 Débloquer</a></div>${S.hook?`<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}?minutes=60" target="_blank" rel="noopener">🤖 Android</a>`:''}<button class="btn full" style="margin-top:10px" data-a="close">Fermer</button>`)});
+}
+function blocCard(b){const st=blocState(b);const lab={valid:'Validé ✓',late:'En retard',now:'En cours',todo:'À venir'}[st];
+ return `<div class="card bloc ${st==='valid'?'valid':st==='now'?'now':st==='late'?'late':''}"><div class="t">${esc(b.start)}<br><span class="dim">${esc(b.end)}</span></div><div class="grow">
+ <div class="row"><b class="grow">${esc(b.title)}</b><span class="st ${st==='now'?'todo':st}">${lab}</span></div>
+ ${b.steps&&b.steps.length?`<ul class="steps">${b.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:''}
+ ${b.proof&&st!=='valid'?`<p class="small dim" style="margin-top:6px">📸 Preuve : ${esc(b.proof)}</p>`:''}
+ ${b.feedback?`<p class="small" style="margin-top:6px;color:${b.status==='valid'?'var(--xp)':'var(--hp)'}">${esc(b.feedback)}</p>`:''}
+ ${st==='now'||st==='late'?`<button class="btn ok sm" style="margin-top:8px" data-a="proof" data-id="${b.id}">📸 Envoyer ma preuve</button>`:''}
+ </div></div>`}
+function renderWelcome(){
+ $('#main').innerHTML=`<div class="card"><h3>Bienvenue 👋</h3><p class="small mute" style="margin-bottom:12px">Épopée Focus organise tes ${S.mode==='ecole'?'devoirs':'tâches'} dans ta semaine, puis verrouille ton téléphone pendant les blocs de travail. Pour débloquer, tu envoies une photo de ce que tu as fait, et l’IA vérifie.</p>
+ <div class="field"><label>Ton code secret du verrou (6 chiffres, le même que sur la page Sport, dans ses réglages)</label><input id="w-pin" inputmode="numeric" maxlength="6" placeholder="Ex. 677451" value="${esc(S.pin)}"></div>
+ <div class="grid3"><div class="field"><label>Réveil</label><input id="w-wake" type="time" value="${esc(S.prof.wake)}"></div><div class="field"><label>Coucher</label><input id="w-sleep" type="time" value="${esc(S.prof.sleep)}"></div><div class="field"><label>Trajet (min)</label><input id="w-com" type="number" min="0" max="180" value="${S.prof.commute}"></div></div>
+ <button class="btn pri full" data-a="welcome">C’est parti</button>
+ <p class="small dim" style="margin-top:10px">Ensuite : ① ajoute ton emploi du temps (onglet Horaires), ② tes ${LB().tasks.toLowerCase()}, ③ génère le planning.</p></div>
+ ${AI?'':'<div class="note warn" style="margin-top:10px">Pour activer l’IA (lecture des captures, planning, vérification des photos), colle ta clé API Claude dans les Réglages.</div>'}`}
+function renderPlan(){
+ const m=M(),t=dkey();let h=`<h2>🗓️ Planning de la semaine</h2>
+ <div class="card"><p class="small mute" style="margin-bottom:10px">L’IA place tes ${LB().tasks.toLowerCase()} dans tes temps libres, en respectant tes ${LB().event}s, tes trajets, ton réveil et ton coucher. Les blocs déjà validés sont gardés.</p>
+ <div id="planbox"><button class="btn pri full" data-a="plan" ${AI&&m.tasks.some(x=>!x.done)?'':'disabled'}>✨ ${m.blocs.some(b=>b.date>=t)?'Recalculer':'Générer'} mon planning</button></div>
+ ${!m.tasks.some(x=>!x.done)?`<p class="small dim" style="margin-top:8px">Ajoute d’abord des ${LB().tasks.toLowerCase()}.</p>`:''}${!m.events.length?`<p class="small dim" style="margin-top:4px">Conseil : ajoute ton emploi du temps pour un meilleur planning.</p>`:''}</div>`;
+ for(let i=0;i<7;i++){const d=addDays(t,i);const bl=m.blocs.filter(b=>b.date===d).sort((a,b)=>toMin(a.start)-toMin(b.start));if(!bl.length)continue;
+  h+=`<div class="day">${dayLabel(d)}</div>`+bl.map(b=>blocCard(b).replace('</div></div>',`<div class="row" style="margin-top:6px;gap:6px"><button class="btn sm" data-a="edit-bloc" data-id="${b.id}">✎ Heure</button><button class="btn sm bad" data-a="del-bloc" data-id="${b.id}">Supprimer</button></div></div></div>`)).join('')}
+ $('#main').innerHTML=h}
+function renderTasks(){
+ const m=M();const open=m.tasks.filter(x=>!x.done).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')),done=m.tasks.filter(x=>x.done);
+ let h=`<h2>${LB().taskIc} ${LB().tasks}</h2>
+ <div class="card"><h3>Ajouter avec l’IA</h3><p class="small mute" style="margin-bottom:10px">${esc(LB().importTasks)}.</p>
+ ${AIimg?`<label class="drop">📸 Choisir des captures<input type="file" id="t-files" accept="image/*" multiple hidden></label><div class="thumbs" id="t-thumbs"></div>`:''}
+ <textarea id="t-text" rows="3" style="margin-top:10px" placeholder="…ou écris / colle ta liste. Ex : maths ex 4 et 5 p.112 pour jeudi, exposé histoire vendredi"></textarea>
+ <div id="t-box" style="margin-top:10px"><button class="btn pri full" data-a="import-tasks" ${AI?'':'disabled'}>✨ Analyser</button></div></div>
+ <button class="btn full" style="margin-top:10px;border-style:dashed" data-a="new-task">＋ Ajouter à la main</button>
+ <h2>À faire <small>${open.length}</small></h2>`;
+ h+=open.length?open.map(taskRow).join(''):`<div class="card small mute">Rien à faire 🎉</div>`;
+ if(done.length)h+=`<h2>Terminés <small>${done.length}</small></h2>`+done.slice(-15).reverse().map(taskRow).join('');
+ $('#main').innerHTML=h;
+ const f=$('#t-files');if(f)f.onchange=()=>thumbs(f.files,'#t-thumbs');
+}
+function taskRow(x){const late=!x.done&&x.due&&x.due<dkey();return `<div class="card task ${x.done?'done':''}"><button class="chk" data-a="toggle-task" data-id="${x.id}">${x.done?'✓':''}</button><div class="grow"><b class="ttl">${esc(x.title)}</b><div class="row wrap" style="gap:6px;margin-top:3px">${x.subject?`<span class="tag">${esc(x.subject)}</span>`:''}${x.due?`<span class="tag" style="${late?'color:var(--hp)':''}">📅 ${dayLabel(x.due)}</span>`:''}${x.est?`<span class="tag">⏱ ${x.est} min</span>`:''}</div>${x.details?`<p class="small dim" style="margin-top:4px">${esc(x.details)}</p>`:''}</div><button class="btn sm" data-a="edit-task" data-id="${x.id}">✎</button></div>`}
+function renderEdt(){
+ const m=M(),pr=S.prof;let h=`<h2>🕘 Mes horaires</h2>
+ <div class="card"><div class="grid3"><div class="field"><label>Réveil</label><input id="p-wake" type="time" value="${esc(pr.wake)}"></div><div class="field"><label>Coucher</label><input id="p-sleep" type="time" value="${esc(pr.sleep)}"></div><div class="field"><label>Trajet (min)</label><input id="p-com" type="number" min="0" max="180" value="${pr.commute}"></div></div>
+ <div class="field"><label>Durée max d’un bloc (min)</label><input id="p-max" type="number" min="15" max="120" value="${pr.maxBloc}"></div>
+ <div class="field"><label>Autres contraintes (sport, activités, repas…)</label><textarea id="p-notes" rows="2" placeholder="Ex : foot mercredi 14h-16h, je mange à 19h30, pas de devoirs le samedi">${esc(pr.notes)}</textarea></div>
+ <button class="btn sm pri" data-a="save-prof">Enregistrer</button></div>
+ <h2>${LB().ic} ${LB().events}</h2>
+ <div class="card"><p class="small mute" style="margin-bottom:10px">Envoie une capture de ton emploi du temps (Pronote, ENT, Google Agenda, Outlook…) ou décris-le.</p>
+ ${AIimg?`<label class="drop">📸 Choisir des captures<input type="file" id="e-files" accept="image/*" multiple hidden></label><div class="thumbs" id="e-thumbs"></div>`:''}
+ <textarea id="e-text" rows="3" style="margin-top:10px" placeholder="Ex : lundi 8h-12h cours, 13h-17h cours ; mercredi 8h-12h…"></textarea>
+ <div id="e-box" style="margin-top:10px"><button class="btn pri full" data-a="import-edt" ${AI?'':'disabled'}>✨ Analyser</button></div></div>
+ <button class="btn full" style="margin-top:10px;border-style:dashed" data-a="new-ev">＋ Ajouter un créneau</button>`;
+ for(let d=0;d<7;d++){const evs=m.events.filter(e=>e.day===d).sort((a,b)=>toMin(a.start)-toMin(b.start));if(!evs.length)continue;
+  h+=`<div class="day">${JOURS[d]}</div><div class="card">${evs.map(e=>`<div class="ev"><b>${esc(e.start)}–${esc(e.end)}</b><span class="grow">${esc(e.title)} <span class="dim">· ${esc(e.kind||'')}</span></span><button class="dim" data-a="del-ev" data-id="${e.id}">✕</button></div>`).join('')}</div>`}
+ $('#main').innerHTML=h;
+ const f=$('#e-files');if(f)f.onchange=()=>thumbs(f.files,'#e-thumbs');
+}
+function renderSet(){
+ $('#main').innerHTML=`<h2>⚙️ Réglages</h2>
+ <div class="card"><div class="field"><label>Code secret du verrou (le même que sur la page Sport)</label><input id="s-pin" inputmode="numeric" maxlength="6" value="${esc(S.pin)}"></div>
+ <div class="field"><label>Adresse de ta page Sport</label><input id="s-sport" value="${esc(S.sportUrl)}"></div>
+ <label class="row small" style="margin-bottom:12px"><input type="checkbox" id="s-need" ${S.needSport?'checked':''} style="width:20px;height:20px"> Exiger la séance de sport avant le temps libre</label>
+ ${NATIVE?'':`<div class="field"><label>Clé API Claude (pour l’IA)</label><input id="s-key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(S.apiKey)}"><p class="small dim" style="margin-top:4px">Crée-la sur console.anthropic.com → API Keys. Elle reste uniquement sur ce téléphone. Chaque analyse coûte quelques centimes, payés sur ton compte Anthropic.</p></div>`}
+ <div class="field"><label>Lien MacroDroid (Android, facultatif)</label><input id="s-hook" placeholder="https://trigger.macrodroid.com/…" value="${esc(S.hook)}"></div>
+ <button class="btn pri" data-a="save-set">Enregistrer</button></div>
+ <div class="card"><h3>📲 Installer le verrou</h3><p class="small mute" style="margin-bottom:10px">Le verrou du téléphone (Raccourcis sur iPhone, MacroDroid sur Android) est le même que pour la page Sport. Le guide pas à pas est sur la page Sport.</p><a class="btn full" href="${esc(S.sportUrl)}#installer" target="_blank" rel="noopener">Ouvrir le guide d’installation</a></div>
+ <div class="card"><h3>Comment ça marche</h3><ul class="steps" style="margin-left:18px"><li>Le téléphone est verrouillé par défaut.</li><li>Sport fait → libre jusqu’au prochain bloc.</li><li>Pendant un bloc, il reste verrouillé. Tu envoies la photo de ton travail : si l’IA valide, tu es libre jusqu’au bloc suivant.</li><li>Après le dernier bloc → libre jusqu’à l’heure du coucher, puis verrouillé jusqu’au lendemain.</li></ul></div>
+ <div class="card"><button class="btn bad" data-a="reset-mode">Effacer les données « ${LB().name} »</button></div>`}
+async function render(){if(!S)return;renderTop();renderNav();({today:renderToday,plan:renderPlan,tasks:renderTasks,edt:renderEdt,set:renderSet})[tab]()}
+function thumbs(files,sel){const el=$(sel);if(!el)return;el.innerHTML='';[...files].slice(0,8).forEach(f=>{const i=document.createElement('img');i.src=URL.createObjectURL(f);el.appendChild(i)})}
+function holdBtn(b,ms,cb){const bar=b.querySelector('i');let t=null;const st=e=>{e.preventDefault();bar.style.transition=`width ${ms}ms linear`;bar.style.width='100%';t=setTimeout(()=>{t=null;cb()},ms)};const sp=()=>{if(t){clearTimeout(t);t=null}bar.style.transition='none';bar.style.width='0'};b.addEventListener('pointerdown',st);['pointerup','pointerleave','pointercancel'].forEach(e=>b.addEventListener(e,sp))}
+
+/* ========== preuves ========== */
+function proofModal(b){
+ openModal(`<h3>📸 ${esc(b.title)}</h3><p class="small mute" style="margin-bottom:8px">${esc(LB().proofHint)}</p>${b.proof?`<div class="note" style="margin-bottom:12px">Preuve attendue : ${esc(b.proof)}</div>`:''}
+ <label class="drop">📷 Prendre la photo<input type="file" id="pf" accept="image/*" capture="environment" ${AIimg>1?'multiple':''} hidden></label><div class="thumbs" id="pf-th"></div>
+ <p class="small dim" style="margin-top:6px">La photo doit être prise maintenant : une vieille photo de la galerie est refusée.</p>
+ <div id="pf-box" style="margin-top:12px"><div class="row"><button class="btn grow" data-a="close">Annuler</button><button class="btn ok grow" data-a="send-proof" data-id="${b.id}">Envoyer</button></div></div>`);
+ $('#pf').onchange=()=>thumbs($('#pf').files,'#pf-th')}
+async function sendProof(id){
+ const b=M().blocs.find(x=>x.id===id),files=[...($('#pf').files||[])].slice(0,Math.max(1,AIimg));
+ if(!files.length)return toast('Prends d’abord une photo');
+ const old=files.filter(f=>Date.now()-(f.lastModified||0)>3*3600e3);
+ if(old.length===files.length)return toast('Photo trop ancienne : prends-en une nouvelle maintenant');
+ const box=$('#pf-box');box.innerHTML=thinking('Claude vérifie ton travail…');
+ try{const r=await aiCheck(b,files);b.attempts=(b.attempts||0)+1;
+  const ok=r&&r.valid===true&&(+r.confidence||0)>=0.6;
+  b.feedback=String(r&&r.feedback||'').slice(0,240);
+  if(ok){b.status='valid';b.at=Date.now();const tk=M().tasks.find(x=>x.id===b.taskId);
+   if(tk&&!M().blocs.some(o=>o.taskId===tk.id&&o.status!=='valid'&&o.id!==b.id))tk.done=true;
+   save();closeModal();render();toast('✅ Validé ! '+(b.feedback||''),4000)}
+  else{b.status='refused';save();box.innerHTML=`<div class="note warn"><b>Pas validé.</b> ${esc(b.feedback||'La photo ne montre pas assez clairement le travail.')}${r&&r.seen?'<br><span class="dim">Vu : '+esc(r.seen)+'</span>':''}</div><div class="row" style="margin-top:10px"><button class="btn grow" data-a="close">Fermer</button><button class="btn pri grow" data-a="proof" data-id="${b.id}">Réessayer</button></div>`;render()}
+ }catch(e){box.innerHTML=`<div class="note warn">${esc(aiErr(e))}</div><button class="btn full" style="margin-top:10px" data-a="proof" data-id="${b.id}">Réessayer</button>`}}
+
+/* ========== événements ========== */
+document.addEventListener('click',async e=>{
+ const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,id=el.dataset.id,m=M();
+ if(a==='scrim'){if(e.target===el)closeModal();return}
+ switch(a){
+ case'close':closeModal();break;
+ case'tab':tab=id;scrollTo(0,0);render();break;
+ case'mode':S.mode=id;save();render();break;
+ case'copy':try{await navigator.clipboard.writeText(id);toast('📋 Code copié. Lance maintenant « Epopee Debloquer ».')}catch(err){openModal(`<h3>Copie ce texte</h3><input value="${esc(id)}" readonly onfocus="this.select()"><button class="btn full" style="margin-top:10px" data-a="close">OK</button>`)}break;
+ case'welcome':{const p=$('#w-pin').value.trim();if(!/^\d{6}$/.test(p))return toast('Le code secret fait 6 chiffres (voir réglages de la page Sport)');S.pin=p;S.prof.wake=$('#w-wake').value||'07:00';S.prof.sleep=$('#w-sleep').value||'22:30';S.prof.commute=+$('#w-com').value||0;S.setup=true;save();tab='edt';render();break}
+ case'proof':proofModal(m.blocs.find(b=>b.id===id));break;
+ case'send-proof':sendProof(id);break;
+ case'plan':{const box=$('#planbox');box.innerHTML=thinking('Claude construit ton planning… (jusqu’à une minute)');
+  try{const r=await aiPlan();if(!Array.isArray(r))throw{code:'invalid_json'};const t=dkey();
+   const keep=m.blocs.filter(b=>b.status==='valid'||b.date<t||(b.date===t&&toMin(b.start)<=nowMin()));
+   const fresh=r.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&toMin(x.start)!=null&&toMin(x.end)>toMin(x.start)).map(x=>({id:uid(),date:x.date,start:toHM(toMin(x.start)),end:toHM(toMin(x.end)),taskId:String(x.taskId||''),title:String(x.title||'Bloc').slice(0,80),steps:(Array.isArray(x.steps)?x.steps:[]).slice(0,4).map(s=>String(s).slice(0,140)),proof:String(x.proof||'').slice(0,160),status:'todo'}));
+   m.blocs=[...keep,...fresh];save();render();toast(`🗓️ ${fresh.length} blocs planifiés`)}
+  catch(err){box.innerHTML=`<div class="note warn">${esc(aiErr(err))}</div><button class="btn pri full" style="margin-top:8px" data-a="plan">Réessayer</button>`}break}
+ case'import-tasks':case'import-edt':{const isT=a==='import-tasks',pre=isT?'t':'e';const files=[...(($('#'+pre+'-files')||{}).files||[])].slice(0,Math.max(0,AIimg)),text=$('#'+pre+'-text').value.trim();
+  if(!files.length&&!text)return toast('Ajoute une capture ou du texte');
+  const box=$('#'+pre+'-box');box.innerHTML=thinking('Claude lit '+(files.length?'tes captures':'ton texte')+'…');
+  try{const r=await(isT?aiTasks(files,text):aiSchedule(files,text));if(!Array.isArray(r))throw{code:'invalid_json'};
+   if(isT){const add=r.filter(x=>x&&x.title).map(x=>({id:uid(),title:String(x.title).slice(0,100),subject:String(x.subject||'').slice(0,40),due:/^\d{4}-\d{2}-\d{2}$/.test(x.due)?x.due:'',est:Math.max(5,Math.min(240,+x.est||30)),details:String(x.details||'').slice(0,300),done:false}));m.tasks.push(...add);save();render();toast(`${add.length} ${LB().task}${add.length>1?'s':''} ajouté${add.length>1?'s':''}`)}
+   else{const add=r.filter(x=>x&&x.day>=0&&x.day<=6&&toMin(x.start)!=null&&toMin(x.end)>toMin(x.start)).map(x=>({id:uid(),day:+x.day,start:toHM(toMin(x.start)),end:toHM(toMin(x.end)),title:String(x.title||LB().event).slice(0,60),kind:String(x.kind||'').slice(0,20)}));
+    openModal(`<h3>${add.length} créneaux trouvés</h3><p class="small mute" style="margin-bottom:10px">Remplacer ton emploi du temps actuel ou les ajouter ?</p><div class="row"><button class="btn grow" data-a="edt-add">Ajouter</button><button class="btn pri grow" data-a="edt-replace">Remplacer</button></div>`);window._edt=add;render()}
+  }catch(err){box.innerHTML=`<div class="note warn">${esc(aiErr(err))}</div><button class="btn pri full" style="margin-top:8px" data-a="${a}">Réessayer</button>`}break}
+ case'edt-add':m.events.push(...(window._edt||[]));save();closeModal();render();break;
+ case'edt-replace':m.events=window._edt||[];save();closeModal();render();break;
+ case'del-ev':m.events=m.events.filter(x=>x.id!==id);save();render();break;
+ case'new-ev':openModal(`<h3>Nouveau créneau</h3><div class="field"><label>Jour</label><select id="n-day">${JOURS.map((j,i)=>`<option value="${i}">${j}</option>`).join('')}</select></div><div class="grid3"><div class="field"><label>Début</label><input id="n-s" type="time" value="08:00"></div><div class="field"><label>Fin</label><input id="n-e" type="time" value="09:00"></div><div class="field"><label>Type</label><select id="n-k"><option>${LB().event}</option><option>activite</option><option>trajet</option></select></div></div><div class="field"><label>Intitulé</label><input id="n-t" maxlength="60"></div><div class="row"><button class="btn grow" data-a="close">Annuler</button><button class="btn pri grow" data-a="save-ev">Ajouter</button></div>`);break;
+ case'save-ev':{const s=$('#n-s').value,en=$('#n-e').value;if(!(toMin(en)>toMin(s)))return toast('L’heure de fin doit être après le début');m.events.push({id:uid(),day:+$('#n-day').value,start:s,end:en,kind:$('#n-k').value,title:$('#n-t').value.trim()||LB().event});save();closeModal();render();break}
+ case'save-prof':{const p=S.prof;p.wake=$('#p-wake').value||p.wake;p.sleep=$('#p-sleep').value||p.sleep;p.commute=Math.max(0,+$('#p-com').value||0);p.maxBloc=Math.max(15,Math.min(120,+$('#p-max').value||50));p.notes=$('#p-notes').value.trim().slice(0,600);save();toast('Enregistré ✅');break}
+ case'new-task':case'edit-task':{const x=m.tasks.find(t=>t.id===id)||{title:'',subject:'',due:addDays(dkey(),1),est:30,details:''};
+  openModal(`<h3>${id?'Modifier':'Nouveau'} ${LB().task}</h3><div class="field"><label>Intitulé</label><input id="k-t" maxlength="100" value="${esc(x.title)}"></div><div class="grid3"><div class="field"><label>${LB().subj}</label><input id="k-s" maxlength="40" value="${esc(x.subject)}"></div><div class="field"><label>Pour le</label><input id="k-d" type="date" value="${esc(x.due)}"></div><div class="field"><label>Durée (min)</label><input id="k-e" type="number" min="5" max="240" value="${x.est}"></div></div><div class="field"><label>Détails</label><textarea id="k-x" rows="2">${esc(x.details)}</textarea></div><div class="row">${id?`<button class="btn bad" data-a="del-task" data-id="${id}">Supprimer</button>`:''}<button class="btn grow" data-a="close">Annuler</button><button class="btn pri grow" data-a="save-task" data-id="${id||''}">Enregistrer</button></div>`);break}
+ case'save-task':{const v={title:$('#k-t').value.trim(),subject:$('#k-s').value.trim(),due:$('#k-d').value,est:Math.max(5,Math.min(240,+$('#k-e').value||30)),details:$('#k-x').value.trim()};if(!v.title)return $('#k-t').focus();
+  if(id)Object.assign(m.tasks.find(t=>t.id===id),v);else m.tasks.push({id:uid(),done:false,...v});save();closeModal();render();break}
+ case'del-task':m.tasks=m.tasks.filter(t=>t.id!==id);m.blocs=m.blocs.filter(b=>b.taskId!==id||b.status==='valid');save();closeModal();render();break;
+ case'toggle-task':{const x=m.tasks.find(t=>t.id===id);x.done=!x.done;save();render();break}
+ case'del-bloc':{const b=m.blocs.find(x=>x.id===id);if(b&&blocState(b)==='late'){return toast('Un bloc en retard ne peut pas être supprimé : envoie ta preuve')}m.blocs=m.blocs.filter(x=>x.id!==id);save();render();break}
+ case'edit-bloc':{const b=m.blocs.find(x=>x.id===id);openModal(`<h3>${esc(b.title)}</h3><div class="grid3"><div class="field"><label>Jour</label><input id="b-d" type="date" value="${b.date}" min="${dkey()}"></div><div class="field"><label>Début</label><input id="b-s" type="time" value="${b.start}"></div><div class="field"><label>Fin</label><input id="b-e" type="time" value="${b.end}"></div></div><div class="row"><button class="btn grow" data-a="close">Annuler</button><button class="btn pri grow" data-a="save-bloc" data-id="${id}">Enregistrer</button></div>`);break}
+ case'save-bloc':{const b=m.blocs.find(x=>x.id===id),s=$('#b-s').value,en=$('#b-e').value,d=$('#b-d').value;if(!(toMin(en)>toMin(s)))return toast('Fin après le début');if(blocState(b)==='late'||blocState(b)==='now')return toast('Ce bloc a déjà commencé');b.date=d||b.date;b.start=s;b.end=en;save();closeModal();render();break}
+ case'save-set':{const p=$('#s-pin').value.trim();if(!/^\d{6}$/.test(p))return toast('Le code secret fait 6 chiffres');S.pin=p;S.sportUrl=$('#s-sport').value.trim()||S.sportUrl;S.needSport=$('#s-need').checked;const hk=$('#s-hook').value.trim();if(hk&&!/^https:\/\/trigger\.macrodroid\.com\//.test(hk))return toast('Lien MacroDroid invalide');S.hook=hk;const kk=$('#s-key');if(kk){S.apiKey=kk.value.trim();setApiAI()}save();toast('Enregistré ✅');break}
+ case'reset-mode':openModal(`<h3>Tout effacer pour « ${LB().name} » ?</h3><p class="small mute" style="margin-bottom:12px">Emploi du temps, ${LB().tasks.toLowerCase()} et planning seront supprimés.</p><div class="row"><button class="btn grow" data-a="close">Annuler</button><button class="btn bad grow" data-a="reset-ok">Effacer</button></div>`);break;
+ case'reset-ok':S.data[S.mode]={events:[],tasks:[],blocs:[]};save();closeModal();render();break;
+ }});
+
+/* ========== page Sport sur le même site : on lit son état ========== */
+function syncSport(){try{const sp=JSON.parse(localStorage.getItem('epopee_sport_v1')||'null');if(!sp)return;
+ if(!S.pin&&sp.pin)S.pin=sp.pin;const d=sp.days&&sp.days[dkey()];if(d&&d.unlocked&&!d.urgence&&!S.sport[dkey()]){S.sport[dkey()]=1;save()}}catch(e){}}
+/* ========== retour depuis la page Sport : #sport-CODE ========== */
+async function checkSportHash(){
+ const m=/^#sport-([0-9A-F]{6})$/i.exec(location.hash||'');if(!m||!S.pin)return;
+ const t=dkey(),expect=await sha6(S.pin+'|'+t);
+ if(m[1].toUpperCase()===expect){if(!S.sport[t]){S.sport[t]=1;save();toast('🏋️ Séance de sport validée !')}tab='today';render()}
+ else toast('Code sport invalide : vérifie que le code secret est le même sur les deux pages');
+ try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+window.addEventListener('hashchange',checkSportHash);
+
+/* ========== démarrage ========== */
+setInterval(()=>{if(S&&tab==='today'&&!$('#modal').innerHTML){syncSport();render()}},30000);
+document.addEventListener('visibilitychange',()=>{if(S&&document.visibilityState==='visible'){syncSport();render()}});
+(async()=>{$('#main').innerHTML=thinking('Chargement…');
+ const [loaded]=await Promise.all([Store.init(),initAI()]);S=norm(loaded||fresh());
+ for(const k in S.sport)if(k<addDays(dkey(),-30))delete S.sport[k];
+ if(Store.mode==='cloud'){if(loaded)Store.save();Store.watch()}
+ syncSport();setApiAI&&!NATIVE&&setApiAI();render();checkSportHash()})();
+</script>
+</body>
+</html>

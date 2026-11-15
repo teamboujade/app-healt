@@ -114,7 +114,9 @@ const dkey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth() + 1) +
 const addDays = (k, n) => { const [y, m, d] = k.split('-').map(Number); return dkey(new Date(y, m - 1, d + n)); };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.pin) return s; } catch (e) {} return null; }
-let S = load() || { pin: String(Math.floor(100000 + Math.random() * 900000)), prog: { pompes: 20, abdos: 20, squats: 20 }, on: { pompes: true, abdos: true, squats: true }, hook: '', focusUrl: 'https://claude.ai/artifact/2B9FuQhEvQBeLW7eMLYLVB', days: {}, lastUrgence: null, voice: true, seenGuide: false };
+let S0 = load();
+if (S0 && (!S0.focusUrl || /claude\.ai\/artifact/.test(S0.focusUrl))) S0.focusUrl = './focus.html';
+let S = S0 || { pin: String(Math.floor(100000 + Math.random() * 900000)), prog: { pompes: 20, abdos: 20, squats: 20 }, on: { pompes: true, abdos: true, squats: true }, hook: '', focusUrl: './focus.html', days: {}, lastUrgence: null, voice: true, seenGuide: false };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 save();
 const today = () => { const k = dkey(); S.days[k] = S.days[k] || { reps: {} }; return S.days[k]; };
@@ -157,9 +159,9 @@ async function renderHome() {
   const code = un ? await dayCode(S.pin, dkey()) : '';
   const tok = un ? (d.urgence ? d.tok : await unlockToken()) : '';
   const st = streak();
-  let h = `<div class="row" style="margin-bottom:14px"><div class="grow"><h1>Épopée Sport</h1><div class="small mute">Sport d’abord, écran ensuite.</div></div><a class="btn sm" href="#reglages">⚙️</a></div>`;
+  let h = `<div class="row" style="margin-bottom:14px"><div class="grow"><h1>Épopée Sport</h1><div class="small mute">Sport d’abord, écran ensuite.</div></div><a class="btn sm" href="./focus.html">📚 Devoirs</a><a class="btn sm" href="#reglages">⚙️</a></div>`;
   if (un) {
-    h += `<div class="card lock on"><div class="ic">🔓</div><h2 style="margin:10px 0 4px">${d.urgence ? 'Déblocage d’urgence' : 'Téléphone débloqué'}</h2>${S.focusUrl && !d.urgence ? `<p class="small mute" style="margin-bottom:12px">Séance validée. Épopée Focus calcule jusqu’à quand tu es libre, selon tes devoirs.</p><a class="btn pri full" href="${esc(S.focusUrl.split('#')[0])}#sport-${code}" target="_blank" rel="noopener">Continuer vers Focus →</a>` : `<p class="small mute">Jusqu’à ${esc(tok.slice(-5))}. Code :</p><div class="code">${tok.slice(0, 6)}</div><p class="small dim" style="margin-bottom:10px">${esc(tok)}</p>
+    h += `<div class="card lock on"><div class="ic">🔓</div><h2 style="margin:10px 0 4px">${d.urgence ? 'Déblocage d’urgence' : 'Téléphone débloqué'}</h2>${S.focusUrl && !d.urgence ? `<p class="small mute" style="margin-bottom:12px">Séance validée. Épopée Focus calcule jusqu’à quand tu es libre, selon tes devoirs.</p><a class="btn pri full" href="${esc(S.focusUrl.split('#')[0])}#sport-${code}">Continuer vers Focus →</a>` : `<p class="small mute">Jusqu’à ${esc(tok.slice(-5))}. Code :</p><div class="code">${tok.slice(0, 6)}</div><p class="small dim" style="margin-bottom:10px">${esc(tok)}</p>
       <a class="btn pri full" href="${iosLink(tok)}">🍎 Débloquer mon iPhone</a>
       ${S.hook ? `<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}?minutes=${minsLeft(tok.slice(-5))}" target="_blank" rel="noopener">🤖 Débloquer mon Android</a>` : `<p class="small dim" style="margin-top:8px">Android : ajoute ton lien MacroDroid dans <a href="#installer">Installer le verrou</a>.</p>`}`}</div>`;
   } else if (done) {
@@ -199,14 +201,14 @@ function renderSettings() {
   for (const k in EXERCISES) h += `<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><label class="row grow" style="gap:8px"><input type="checkbox" data-on="${k}" ${S.on[k] ? 'checked' : ''} style="width:20px;height:20px">${EXERCISES[k].i} ${EXERCISES[k].n}</label><div class="num"><button data-dec="${k}">−</button><b>${S.prog[k]}</b><button data-inc="${k}">+</button></div></div>`;
   h += `<p class="note" style="margin-top:10px">Pour éviter de tricher, une séance déjà validée aujourd’hui n’est pas affectée : les changements comptent à partir de demain.</p></div>`;
   h += `<div class="card"><h3>Voix</h3><label class="row small"><input type="checkbox" id="voice" ${S.voice ? 'checked' : ''} style="width:20px;height:20px"> Compter les répétitions à voix haute</label></div>`;
-  h += `<div class="card"><h3>Lien de ta page Focus (devoirs / travail)</h3><p class="small mute" style="margin-bottom:8px">Facultatif. S’il est rempli, après la séance tu es envoyé sur Focus, qui débloque jusqu’à ton prochain bloc de devoirs.</p><input id="focusUrl" placeholder="https://claude.ai/artifact/…" value="${esc(S.focusUrl)}"><button class="btn sm" id="saveFocus" style="margin-top:8px">Enregistrer</button></div>`;
+  h += `<div class="card"><h3>Lien de ta page Focus (devoirs / travail)</h3><p class="small mute" style="margin-bottom:8px">Par défaut : la page Focus de ce site (./focus.html). Après la séance, Focus débloque jusqu’à ton prochain bloc de devoirs. Vide ce champ pour ne pas utiliser Focus.</p><input id="focusUrl" placeholder="./focus.html" value="${esc(S.focusUrl)}"><button class="btn sm" id="saveFocus" style="margin-top:8px">Enregistrer</button></div>`;
   h += `<div class="card"><h3>Code secret du verrou</h3><p class="small mute">Il sert à calculer les codes de déblocage. Tape-le à l’identique dans ton raccourci iPhone et dans les réglages de la page Focus.</p><div class="code" style="font-size:30px">${S.pin}</div></div>`;
   app.innerHTML = h;
   const d = today();
   app.querySelectorAll('[data-inc],[data-dec]').forEach(b => b.onclick = () => { const k = b.dataset.inc || b.dataset.dec; const step = b.dataset.inc ? 5 : -5; S.prog[k] = Math.max(5, Math.min(200, S.prog[k] + step)); if (d.unlocked) d.keep = true; save(); renderSettings(); });
   app.querySelectorAll('[data-on]').forEach(c => c.onchange = () => { S.on[c.dataset.on] = c.checked; if (!active().length) { S.on[c.dataset.on] = true; c.checked = true; toast('Garde au moins un exercice'); } save(); });
   document.getElementById('voice').onchange = e => { S.voice = e.target.checked; save(); };
-  document.getElementById('saveFocus').onclick = () => { const v = document.getElementById('focusUrl').value.trim(); if (v && !/^https:\/\//.test(v)) return toast('Colle un lien qui commence par https://'); S.focusUrl = v; save(); toast('Enregistré ✅'); };
+  document.getElementById('saveFocus').onclick = () => { const v = document.getElementById('focusUrl').value.trim(); if (v && !/^(https:\/\/|\.\/)/.test(v)) return toast('Lien invalide'); S.focusUrl = v; save(); toast('Enregistré ✅'); };
 }
 
 let gtab = /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : /android/i.test(navigator.userAgent) ? 'android' : 'ios';
