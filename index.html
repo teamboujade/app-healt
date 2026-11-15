@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#100f1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Épopée Sport — mérite ton téléphone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#100f1c;--bg2:#16152a;--panel:#1d1b33;--panel2:#25223f;--line:#35315a;--ink:#f3efe6;--mute:#a29cc0;--dim:#6f6990;
+--gold:#ffcc4d;--xp:#5be37d;--mana:#4dc9ff;--hp:#ff5c7a;--ember:#ff8a3d;--px:'Pixelify Sans',ui-monospace,monospace;--tx:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--tx);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(1000px 420px at 50% -180px,#2a2350,transparent 70%),var(--bg)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:var(--ink);background:var(--bg2);border:2px solid var(--line);border-radius:7px;padding:10px 12px;width:100%;outline:none}
+input:focus{border-color:var(--mana)}
+a{color:var(--mana)}
+.app{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(40px + env(safe-area-inset-bottom))}
+h1,h2,h3,.px{font-family:var(--px);font-weight:700;letter-spacing:.3px}
+h1{font-size:24px} h2{font-size:18px;margin:24px 2px 10px} h3{font-size:16px;margin-bottom:6px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:11px;padding:14px;box-shadow:0 4px 0 #0a0914}
+.card+.card{margin-top:10px}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}
+.mute{color:var(--mute)}.dim{color:var(--dim)}.small{font-size:13px}
+.btn{font-family:var(--px);font-weight:700;font-size:16px;padding:11px 16px;border-radius:8px;background:var(--panel2);border:2px solid var(--line);box-shadow:0 3px 0 #0a0914;text-align:center;display:inline-block;text-decoration:none;color:var(--ink)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0a0914}
+.btn.pri{background:var(--gold);color:#2a1d00;border-color:#ffe08a;box-shadow:0 3px 0 #a87b12}
+.btn.ok{background:var(--xp);color:#062512;border-color:#9ff2b4;box-shadow:0 3px 0 #2a8c47}
+.btn.full{width:100%;display:block}.btn.sm{font-size:13px;padding:7px 11px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.bar{height:10px;background:#0b0a16;border:2px solid var(--line);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--xp);transition:width .4s}
+.lock{text-align:center;padding:22px 14px}
+.lock .ic{font-size:54px;line-height:1}
+.lock.on{border-color:#2b6b45;background:linear-gradient(180deg,#183327,var(--panel))}
+.lock.off{border-color:#5a2a3a;background:linear-gradient(180deg,#2c1624,var(--panel))}
+.ex{display:flex;align-items:center;gap:12px}
+.ex .ei{width:50px;height:50px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:26px;flex:none}
+.ex.done{border-color:#2b5a3c}
+.code{font-family:var(--px);font-size:40px;letter-spacing:8px;text-align:center;color:var(--gold);margin:6px 0 12px}
+.days{display:flex;gap:5px;justify-content:space-between}
+.days i{flex:1;aspect-ratio:1;border-radius:4px;background:#0b0a16;border:1px solid var(--line);display:block}
+.days i.ok{background:var(--xp);border-color:var(--xp)}.days i.urg{background:var(--ember);border-color:var(--ember)}
+.days i.today{outline:2px solid var(--gold);outline-offset:1px}
+.steps{counter-reset:s;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 36px;font-size:14px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:6px;background:var(--panel2);font-family:var(--px);display:grid;place-items:center;font-size:13px}
+.steps b{color:var(--ink)} .steps code,.mono{font-family:ui-monospace,monospace;background:#0b0a16;padding:1px 6px;border-radius:4px;color:var(--gold);font-size:13px;word-break:break-all}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg2);font-family:var(--px);font-size:15px}
+.tabs button.on{border-color:var(--gold);color:var(--gold);background:#2a2412}
+.note{background:#1a1830;border-left:3px solid var(--gold);padding:10px 12px;border-radius:6px;font-size:13px;color:var(--mute)}
+.note.warn{border-color:var(--hp)}
+.num{display:flex;align-items:center;gap:8px}
+.num button{width:38px;height:38px;border-radius:8px;background:var(--panel2);border:2px solid var(--line);font-family:var(--px);font-size:18px}
+.num b{font-family:var(--px);font-size:20px;min-width:40px;text-align:center}
+/* séance */
+#cam{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+#cam.on{display:flex}
+#stage{position:relative;flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#stage video,#stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#stage.mirror video,#stage.mirror canvas{transform:scaleX(-1)}
+.hud{position:absolute;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;display:flex;align-items:center;gap:10px;background:linear-gradient(#000c,#0000);z-index:4}
+.hud .iconb{width:42px;height:42px;border-radius:10px;background:#0009;border:2px solid #fff3;font-size:18px;display:grid;place-items:center;flex:none}
+.big{position:absolute;left:0;right:0;bottom:0;padding:14px 14px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(#0000,#000d 40%);z-index:2;text-align:center}
+.counter{font-family:var(--px);font-size:84px;line-height:1;text-shadow:0 4px 0 #000}
+.counter small{font-size:30px;color:var(--mute)}
+.fb{font-family:var(--px);font-size:18px;min-height:28px;margin:6px 0 10px}
+.fb.good{color:var(--xp)}.fb.bad{color:var(--hp)}.fb.info{color:var(--gold)}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:3;background:#000a}
+.center .t{font-family:var(--px);font-size:26px;margin-bottom:10px}
+.pulse{animation:pulse .5s ease-out}
+@keyframes pulse{0%{transform:scale(1.35);color:var(--xp)}100%{transform:scale(1)}}
+.hold{position:relative;overflow:hidden}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ff8a3d55;transition:width linear}
+#toast{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%);background:#0b0a16;border:2px solid var(--line);padding:9px 16px;border-radius:9px;font-family:var(--px);z-index:80;display:none;max-width:92vw;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<div id="cam">
+  <div id="stage" class="mirror">
+    <video id="video" playsinline muted autoplay></video>
+    <canvas id="canvas"></canvas>
+    <div class="hud">
+      <button class="iconb" id="camClose" aria-label="Fermer">✕</button>
+      <div class="grow"><b class="px" id="camTitle" style="font-size:18px"></b><div class="small" style="color:#ccc" id="camSub"></div></div>
+      <button class="iconb" id="camVoice" aria-label="Voix">🔊</button>
+      <button class="iconb" id="camFlip" aria-label="Changer de caméra">🔄</button>
+    </div>
+    <div class="big" id="camBig">
+      <div class="counter" id="camCount">0<small>/20</small></div>
+      <div class="fb" id="camFb"></div>
+      <div class="bar" style="max-width:420px;margin:0 auto"><i id="camBar" style="width:0%"></i></div>
+    </div>
+    <div class="center" id="camCenter"><div class="t">Chargement…</div></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script type="module">
+import { RepCounter, EXERCISES, CHALLENGES, challengeOk, dayCode } from './pose-logic.js';
+
+/* ---------- état ---------- */
+const KEY = 'epopee_sport_v1';
+const pad = n => String(n).padStart(2, '0');
+const dkey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const addDays = (k, n) => { const [y, m, d] = k.split('-').map(Number); return dkey(new Date(y, m - 1, d + n)); };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.pin) return s; } catch (e) {} return null; }
+let S = load() || { pin: String(Math.floor(100000 + Math.random() * 900000)), prog: { pompes: 20, abdos: 20, squats: 20 }, on: { pompes: true, abdos: true, squats: true }, hook: '', days: {}, lastUrgence: null, voice: true, seenGuide: false };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+save();
+const today = () => { const k = dkey(); S.days[k] = S.days[k] || { reps: {} }; return S.days[k]; };
+const active = () => Object.keys(EXERCISES).filter(k => S.on[k] && S.prog[k] > 0);
+const allDone = (d = today()) => active().length > 0 && active().every(k => (d.reps[k] || 0) >= S.prog[k]);
+const pageUrl = () => location.href.split('#')[0];
+const SHORTCUT = 'Epopee Debloquer';
+
+function toast(msg, ms = 2600) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => t.style.display = 'none', ms); }
+function streak() { let k = dkey(), n = 0; if (!(S.days[k] && S.days[k].unlocked && !S.days[k].urgence)) k = addDays(k, -1); while (S.days[k] && S.days[k].unlocked && !S.days[k].urgence) { n++; k = addDays(k, -1); } return n; }
+
+/* ---------- déverrouillage ---------- */
+async function unlockNow(urgence = false) {
+  const d = today();
+  if (!d.unlocked) { d.unlocked = true; d.urgence = urgence; d.at = Date.now(); save(); }
+  if (S.hook) { try { fetch(S.hook, { mode: 'no-cors' }); } catch (e) {} }
+  render();
+}
+function iosLink(code) { return 'shortcuts://run-shortcut?name=' + encodeURIComponent(SHORTCUT) + '&input=text&text=' + encodeURIComponent(code); }
+
+/* ---------- vues ---------- */
+const app = document.getElementById('app');
+function route() { return (location.hash || '#accueil').slice(1); }
+window.addEventListener('hashchange', render);
+
+async function render() {
+  const r = route();
+  if (!S.seenGuide && r === 'accueil') { location.hash = '#installer'; return; }
+  if (r === 'installer') return renderGuide();
+  if (r === 'reglages') return renderSettings();
+  return renderHome();
+}
+
+async function renderHome() {
+  const d = today(), done = allDone(), un = !!d.unlocked;
+  const code = un ? await dayCode(S.pin, dkey()) : '';
+  const st = streak();
+  let h = `<div class="row" style="margin-bottom:14px"><div class="grow"><h1>Épopée Sport</h1><div class="small mute">Sport d’abord, écran ensuite.</div></div><a class="btn sm" href="#reglages">⚙️</a></div>`;
+  if (un) {
+    h += `<div class="card lock on"><div class="ic">🔓</div><h2 style="margin:10px 0 4px">${d.urgence ? 'Déblocage d’urgence' : 'Téléphone débloqué'}</h2><p class="small mute">Jusqu’à minuit. Code du jour :</p><div class="code">${code}</div>
+      <a class="btn pri full" href="${iosLink(code)}">🍎 Débloquer mon iPhone</a>
+      ${S.hook ? `<a class="btn full" style="margin-top:8px" href="${esc(S.hook)}" target="_blank" rel="noopener">🤖 Débloquer mon Android</a><p class="small dim" style="margin-top:6px">Android : le déblocage a déjà été envoyé automatiquement. Le bouton sert si ça n’a pas marché.</p>` : `<p class="small dim" style="margin-top:8px">Android : ajoute ton lien MacroDroid dans <a href="#installer">Installer le verrou</a>.</p>`}</div>`;
+  } else if (done) {
+    h += `<div class="card lock on"><div class="ic">🏆</div><h2 style="margin:10px 0 6px">Séance validée !</h2><button class="btn ok full" id="doUnlock">Débloquer mon téléphone</button></div>`;
+  } else {
+    h += `<div class="card lock off"><div class="ic">🔒</div><h2 style="margin:10px 0 4px">Téléphone verrouillé</h2><p class="small mute">Fais ta séance devant la caméra pour récupérer tes applis.</p></div>`;
+  }
+  h += `<h2>🏋️ Séance du jour</h2>`;
+  for (const k of active()) {
+    const e = EXERCISES[k], n = Math.min(d.reps[k] || 0, S.prog[k]), ok = n >= S.prog[k];
+    h += `<div class="card ex ${ok ? 'done' : ''}"><div class="ei">${e.i}</div><div class="grow"><div class="row"><b class="grow">${e.n}</b><span class="px" style="color:${ok ? 'var(--xp)' : 'var(--ink)'}">${n}/${S.prog[k]}</span></div><div class="bar" style="margin-top:7px"><i style="width:${n / S.prog[k] * 100}%"></i></div></div>
+      ${ok ? '<span style="font-size:22px">✅</span>' : `<button class="btn pri sm" data-go="${k}">Go</button>`}</div>`;
+  }
+  if (!active().length) h += `<div class="card small mute">Aucun exercice activé. Va dans les réglages.</div>`;
+  // 14 jours
+  let cells = ''; for (let i = 13; i >= 0; i--) { const k = addDays(dkey(), -i), x = S.days[k]; cells += `<i class="${x && x.unlocked ? (x.urgence ? 'urg' : 'ok') : ''} ${i === 0 ? 'today' : ''}" title="${k}"></i>`; }
+  h += `<h2>🔥 Série : ${st} jour${st > 1 ? 's' : ''}</h2><div class="card"><div class="days">${cells}</div><p class="small dim" style="margin-top:8px">Vert = séance faite · orange = déblocage d’urgence</p></div>`;
+  // urgence
+  const lastU = S.lastUrgence, can = !lastU || addDays(lastU, 7) <= dkey();
+  if (!un) h += `<h2>🆘 Urgence</h2><div class="card"><p class="small mute" style="margin-bottom:10px">Besoin vital de ton téléphone ? Un déblocage d’urgence par semaine. Il casse ta série.</p>${can ? `<button class="btn full hold" id="urg"><i></i><span>Maintiens 5 secondes</span></button>` : `<p class="small dim">Prochain déblocage d’urgence possible le ${addDays(lastU, 7).split('-').reverse().join('/')}.</p>`}</div>`;
+  h += `<p style="text-align:center;margin-top:22px"><a href="#installer" class="small">📲 Installer ou vérifier le verrou</a></p>`;
+  app.innerHTML = h;
+  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => startSession(b.dataset.go));
+  const du = document.getElementById('doUnlock'); if (du) du.onclick = () => unlockNow(false);
+  const u = document.getElementById('urg'); if (u) holdButton(u, 5000, () => { S.lastUrgence = dkey(); unlockNow(true); toast('Déblocage d’urgence activé'); });
+}
+function holdButton(b, ms, cb) {
+  const bar = b.querySelector('i'); let t = null;
+  const start = e => { e.preventDefault(); bar.style.transition = `width ${ms}ms linear`; bar.style.width = '100%'; t = setTimeout(() => { t = null; cb(); }, ms); };
+  const stop = () => { if (t) { clearTimeout(t); t = null; } bar.style.transition = 'none'; bar.style.width = '0'; };
+  b.addEventListener('pointerdown', start); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+}
+
+function renderSettings() {
+  let h = `<div class="row" style="margin-bottom:14px"><a class="btn sm" href="#accueil">←</a><h1 class="grow">Réglages</h1></div>`;
+  h += `<div class="card"><h3>Ma séance quotidienne</h3><p class="small mute" style="margin-bottom:10px">Le nombre de répétitions à faire chaque jour pour débloquer le téléphone.</p>`;
+  for (const k in EXERCISES) h += `<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><label class="row grow" style="gap:8px"><input type="checkbox" data-on="${k}" ${S.on[k] ? 'checked' : ''} style="width:20px;height:20px">${EXERCISES[k].i} ${EXERCISES[k].n}</label><div class="num"><button data-dec="${k}">−</button><b>${S.prog[k]}</b><button data-inc="${k}">+</button></div></div>`;
+  h += `<p class="note" style="margin-top:10px">Pour éviter de tricher, une séance déjà validée aujourd’hui n’est pas affectée : les changements comptent à partir de demain.</p></div>`;
+  h += `<div class="card"><h3>Voix</h3><label class="row small"><input type="checkbox" id="voice" ${S.voice ? 'checked' : ''} style="width:20px;height:20px"> Compter les répétitions à voix haute</label></div>`;
+  h += `<div class="card"><h3>Code secret du verrou</h3><p class="small mute">Il sert à calculer le code du jour. Tu dois le taper à l’identique dans ton raccourci iPhone.</p><div class="code" style="font-size:30px">${S.pin}</div></div>`;
+  app.innerHTML = h;
+  const d = today();
+  app.querySelectorAll('[data-inc],[data-dec]').forEach(b => b.onclick = () => { const k = b.dataset.inc || b.dataset.dec; const step = b.dataset.inc ? 5 : -5; S.prog[k] = Math.max(5, Math.min(200, S.prog[k] + step)); if (d.unlocked) d.keep = true; save(); renderSettings(); });
+  app.querySelectorAll('[data-on]').forEach(c => c.onchange = () => { S.on[c.dataset.on] = c.checked; if (!active().length) { S.on[c.dataset.on] = true; c.checked = true; toast('Garde au moins un exercice'); } save(); });
+  document.getElementById('voice').onchange = e => { S.voice = e.target.checked; save(); };
+}
+
+let gtab = /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : /android/i.test(navigator.userAgent) ? 'android' : 'ios';
+function renderGuide() {
+  S.seenGuide = true; save();
+  const url = pageUrl();
+  let h = `<div class="row" style="margin-bottom:14px"><a class="btn sm" href="#accueil">←</a><h1 class="grow">Installer le verrou</h1></div>
+  <p class="mute small" style="margin-bottom:12px">Une page web ne peut pas bloquer d’autres applis toute seule. On utilise donc l’automatisation de ton téléphone : quand tu ouvres une appli bloquée, il te renvoie ici tant que la séance du jour n’est pas validée. À faire une seule fois, environ 10 minutes.</p>
+  <div class="note" style="margin-bottom:14px">⚠️ Ne bloque jamais : Safari ou Chrome (pour ouvrir cette page), Raccourcis ou MacroDroid, Téléphone et Messages.</div>
+  <div class="tabs"><button data-t="ios" class="${gtab === 'ios' ? 'on' : ''}">🍎 iPhone</button><button data-t="android" class="${gtab === 'android' ? 'on' : ''}">🤖 Android</button></div>`;
+  if (gtab === 'ios') h += `
+  <div class="card"><h3>1 · Le raccourci « ${SHORTCUT} »</h3><p class="small mute" style="margin-bottom:10px">Il vérifie le code du jour et enregistre le déblocage. Ouvre l’app <b>Raccourcis</b> → <b>+</b>, nomme-le exactement <span class="mono">${SHORTCUT}</span>, puis ajoute ces actions :</p>
+  <ol class="steps">
+   <li><b>Recevoir</b> du <b>Texte</b> en entrée. Si aucune entrée : <b>Demander une entrée</b>.</li>
+   <li><b>Date actuelle</b>, puis <b>Formater la date</b> → format personnalisé <span class="mono">yyyy-MM-dd</span>.</li>
+   <li><b>Texte</b> : tape <span class="mono">${S.pin}|</span> puis insère la variable <b>Date formatée</b>. Ça donne <span class="mono">${S.pin}|${dkey()}</span>.</li>
+   <li><b>Générer un hash</b> (Hash) de type <b>SHA256</b> à partir du Texte.</li>
+   <li><b>Rechercher des correspondances</b> (Correspondre au texte) avec le motif <span class="mono">^.{6}</span> dans le Hash.</li>
+   <li><b>Changer la casse</b> des Correspondances en <b>MAJUSCULES</b>.</li>
+   <li><b>Si</b> l’<b>Entrée du raccourci</b> <b>est</b> le <b>Texte modifié</b> :<br>→ <b>Texte</b> avec la <b>Date formatée</b><br>→ <b>Enregistrer le fichier</b> dans <span class="mono">Raccourcis/epopee.txt</span>, sans demander où enregistrer, avec <b>Remplacer</b> activé<br>→ <b>Afficher la notification</b> « Téléphone débloqué 💪 ».</li>
+   <li><b>Sinon</b> → <b>Afficher l’alerte</b> « Code invalide ».</li>
+  </ol></div>
+  <div class="card"><h3>2 · Le raccourci « Epopee Verrou »</h3><p class="small mute" style="margin-bottom:10px">Il s’exécute quand tu ouvres une appli bloquée.</p>
+  <ol class="steps">
+   <li><b>Date actuelle</b> → <b>Formater la date</b> au format <span class="mono">yyyy-MM-dd</span>.</li>
+   <li><b>Obtenir le fichier</b> <span class="mono">Raccourcis/epopee.txt</span>, avec « Erreur si introuvable » <b>désactivé</b>.</li>
+   <li><b>Obtenir le texte de l’entrée</b> à partir du Fichier.</li>
+   <li><b>Si</b> le Texte <b>est</b> la <b>Date formatée</b> → <b>Arrêter ce raccourci</b>.</li>
+   <li><b>Fin du Si</b>, puis <b>Ouvrir les URL</b> : <span class="mono">${esc(url)}</span></li>
+  </ol></div>
+  <div class="card"><h3>3 · L’automatisation</h3><ol class="steps">
+   <li>Raccourcis → onglet <b>Automatisation</b> → <b>+</b> → <b>App</b>.</li>
+   <li><b>Choisir</b> toutes les applis à bloquer (TikTok, Instagram, YouTube, Snapchat, jeux…), cocher <b>Est ouverte</b>.</li>
+   <li>Sélectionner <b>Exécuter immédiatement</b> et désactiver « Avertir lors de l’exécution ».</li>
+   <li>Action : <b>Exécuter le raccourci</b> → <b>Epopee Verrou</b>.</li>
+  </ol></div>
+  <div class="card"><h3>4 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois atterrir ici. Fais ta séance, puis touche « Débloquer mon iPhone ». Ton téléphone est libre jusqu’à minuit.</p>
+  <p class="note" style="margin-top:10px">💡 Ajoute cette page à ton écran d’accueil : Safari → Partager → « Sur l’écran d’accueil ».</p></div>`;
+  else h += `
+  <div class="card"><h3>1 · Installe MacroDroid</h3><p class="small mute">Gratuit sur le Play Store, et la version gratuite suffit pour les 3 macros. Accepte les autorisations qu’il demande, notamment l’accessibilité et l’affichage par-dessus les autres applis.</p></div>
+  <div class="card"><h3>2 · Variable</h3><ol class="steps"><li>Menu → <b>Variables</b> → <b>+</b> → nom <span class="mono">epopee_ok</span>, type <b>Booléen</b>, valeur <b>faux</b>.</li></ol></div>
+  <div class="card"><h3>3 · Macro « Verrou »</h3><ol class="steps">
+   <li>Déclencheur : <b>Application lancée/fermée</b> → <b>Lancée</b> → choisis toutes les applis à bloquer.</li>
+   <li>Contrainte : <b>Valeur de variable</b> → <span class="mono">epopee_ok</span> = <b>faux</b>.</li>
+   <li>Action 1 : <b>Écran d’accueil</b> (Lancer l’écran d’accueil).</li>
+   <li>Action 2 : <b>Ouvrir une page web</b> → <span class="mono">${esc(url)}</span></li>
+  </ol></div>
+  <div class="card"><h3>4 · Macro « Débloquer »</h3><ol class="steps">
+   <li>Déclencheur : <b>Webhook (URL)</b>. Identifiant : <span class="mono">epopee</span>. MacroDroid te donne un lien qui commence par <span class="mono">https://trigger.macrodroid.com/</span>. Copie-le.</li>
+   <li>Action : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>vrai</b>, puis <b>Afficher une notification</b> « Téléphone débloqué 💪 ».</li>
+   <li>Colle le lien ici :</li></ol>
+   <input id="hook" placeholder="https://trigger.macrodroid.com/…" value="${esc(S.hook)}"><button class="btn sm" id="saveHook" style="margin-top:8px">Enregistrer le lien</button></div>
+  <div class="card"><h3>5 · Macro « Minuit »</h3><ol class="steps">
+   <li>Déclencheur : <b>Jour/Heure</b> → 00:00, tous les jours.</li>
+   <li>Action : <b>Définir une variable</b> → <span class="mono">epopee_ok</span> = <b>faux</b>.</li></ol></div>
+  <div class="card"><h3>6 · Teste</h3><p class="small mute">Ouvre TikTok : tu dois revenir ici. Une fois la séance validée, la page envoie le déblocage toute seule.</p></div>`;
+  h += `<a class="btn pri full" href="#accueil" style="margin-top:16px">C’est installé → ma séance</a>`;
+  app.innerHTML = h;
+  app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { gtab = b.dataset.t; renderGuide(); });
+  const sh = document.getElementById('saveHook');
+  if (sh) sh.onclick = () => { const v = document.getElementById('hook').value.trim(); if (v && !/^https:\/\/trigger\.macrodroid\.com\//.test(v)) return toast('Ce lien ne ressemble pas à un lien MacroDroid'); S.hook = v; save(); toast('Lien enregistré ✅'); };
+}
+
+/* ---------- séance caméra ---------- */
+const cam = document.getElementById('cam'), stage = document.getElementById('stage'), video = document.getElementById('video'), canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+const $c = id => document.getElementById(id);
+let landmarker = null, stream = null, facing = 'user', running = false, sess = null, raf = 0, wake = null;
+const LINKS = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,31],[28,32],[0,11],[0,12]];
+
+async function getLandmarker() {
+  if (landmarker) return landmarker;
+  const { PoseLandmarker, FilesetResolver } = await import('./vendor/vision_bundle.mjs');
+  const fs = await FilesetResolver.forVisionTasks(new URL('./vendor/wasm', location.href).href);
+  const opts = d => ({ baseOptions: { modelAssetPath: new URL('./models/pose_landmarker_lite.task', location.href).href, delegate: d }, runningMode: 'VIDEO', numPoses: 1, minPoseDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+  try { landmarker = await PoseLandmarker.createFromOptions(fs, opts('GPU')); }
+  catch (e) { landmarker = await PoseLandmarker.createFromOptions(fs, opts('CPU')); }
+  return landmarker;
+}
+async function openCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 } } });
+  video.srcObject = stream; await video.play();
+  stage.classList.toggle('mirror', facing === 'user');
+}
+function center(html) { const c = $c('camCenter'); if (html) { c.innerHTML = html; c.style.display = 'flex'; } else c.style.display = 'none'; }
+function say(t) { if (!S.voice || !window.speechSynthesis) return; try { const u = new SpeechSynthesisUtterance(t); u.lang = 'fr-FR'; u.rate = 1.15; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
+function beep(f = 880, d = .08) { try { const A = beep.a = beep.a || new (window.AudioContext || window.webkitAudioContext)(); const o = A.createOscillator(), g = A.createGain(); o.type = 'square'; o.frequency.value = f; g.gain.setValueAtTime(.08, A.currentTime); g.gain.exponentialRampToValueAtTime(.001, A.currentTime + d); o.connect(g); g.connect(A.destination); o.start(); o.stop(A.currentTime + d); } catch (e) {} }
+
+async function startSession(ex) {
+  const e = EXERCISES[ex], d = today();
+  sess = { ex, target: S.prog[ex], counter: new RepCounter(ex), base: d.reps[ex] || 0, phase: 'load', ch: CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)], holdT: 0, lastFb: 0 };
+  sess.counter.count = 0;
+  cam.classList.add('on'); document.body.style.overflow = 'hidden';
+  $c('camTitle').textContent = e.i + ' ' + e.n; $c('camSub').textContent = e.tip;
+  $c('camVoice').textContent = S.voice ? '🔊' : '🔇';
+  updateCount();
+  center(`<div class="t">Préparation de l’IA…</div><p class="small" style="color:#ccc">Le squelette fonctionne entièrement sur ton téléphone. Aucune image n’est envoyée.</p>`);
+  beep(0); // débloque le son sur iOS (geste utilisateur)
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('nocam');
+    await Promise.all([openCamera(), getLandmarker()]);
+  } catch (err) {
+    center(`<div class="t">Caméra indisponible</div><p class="small" style="color:#ccc;max-width:340px">${err && err.name === 'NotAllowedError' ? 'Autorise l’accès à la caméra pour cette page dans les réglages du navigateur, puis réessaie.' : 'Ouvre cette page dans Safari (iPhone) ou Chrome (Android), en https.'}</p><button class="btn pri" style="margin-top:16px" id="retry">Réessayer</button>`);
+    $c('retry').onclick = () => startSession(ex); return;
+  }
+  try { wake = await navigator.wakeLock?.request('screen'); } catch (e) {}
+  sess.phase = 'challenge';
+  center(`<div class="t">Défi de présence</div><p style="font-family:var(--px);font-size:22px;color:var(--gold);max-width:340px">${sess.ch.n}</p><p class="small" style="color:#ccc;margin-top:10px">Pour prouver que c’est bien toi, en direct.</p>`);
+  say(sess.ch.n);
+  running = true; loop();
+}
+function updateCount(pulse) {
+  const n = sess.base + sess.counter.count, el = $c('camCount');
+  el.innerHTML = `${Math.min(n, sess.target)}<small>/${sess.target}</small>`;
+  if (pulse) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
+  $c('camBar').style.width = Math.min(100, n / sess.target * 100) + '%';
+}
+function fb(msg, cls) { const f = $c('camFb'); f.textContent = msg; f.className = 'fb ' + cls; }
+let lastVT = -1;
+function loop() {
+  if (!running) return;
+  raf = requestAnimationFrame(loop);
+  if (video.readyState < 2 || video.currentTime === lastVT) return;
+  lastVT = video.currentTime;
+  const now = performance.now();
+  let res; try { res = landmarker.detectForVideo(video, now); } catch (e) { return; }
+  const lm = res && res.landmarks && res.landmarks[0];
+  const W = video.videoWidth, H = video.videoHeight; if (canvas.width !== W) { canvas.width = W; canvas.height = H; }
+  ctx.clearRect(0, 0, W, H);
+  if (sess.phase === 'challenge') {
+    draw(lm, '#ffcc4d');
+    if (challengeOk(sess.ch.k, lm)) { sess.holdT = sess.holdT || now; if (now - sess.holdT > 800) { sess.phase = 'go'; center(null); fb('C’est parti ! ' + EXERCISES[sess.ex].tip, 'info'); say('C’est parti'); beep(1046, .15); } }
+    else sess.holdT = 0;
+    return;
+  }
+  if (sess.phase !== 'go') { draw(lm, '#888'); return; }
+  const r = sess.counter.update(lm, now, W / H);
+  draw(lm, r.valid ? '#5be37d' : '#ff5c7a');
+  if (r.event === 'rep') {
+    const d = today(); d.reps[sess.ex] = sess.base + sess.counter.count; save();
+    updateCount(true); beep(988); say(String(Math.min(d.reps[sess.ex], sess.target)));
+    fb('Bien ! ✓', 'good'); sess.lastFb = now;
+    if (d.reps[sess.ex] >= sess.target) return finish();
+  } else if (r.event === 'partielle' || r.event === 'tropvite') { fb(r.msg, 'bad'); sess.lastFb = now; beep(220, .15); }
+  else if (now - sess.lastFb > 1500) { r.msg ? fb(r.msg, r.ok ? 'info' : 'bad') : fb(r.valid ? 'Bonne position, continue' : '', 'good'); }
+}
+function draw(lm, col) {
+  if (!lm) return; const W = canvas.width, H = canvas.height;
+  ctx.lineWidth = Math.max(3, W / 160); ctx.strokeStyle = col; ctx.fillStyle = '#fff'; ctx.lineCap = 'round';
+  for (const [a, b] of LINKS) { const p = lm[a], q = lm[b]; if ((p.visibility ?? 1) < .4 || (q.visibility ?? 1) < .4) continue; ctx.beginPath(); ctx.moveTo(p.x * W, p.y * H); ctx.lineTo(q.x * W, q.y * H); ctx.stroke(); }
+  for (const i of [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]) { const p = lm[i]; if ((p.visibility ?? 1) < .4) continue; ctx.beginPath(); ctx.arc(p.x * W, p.y * H, Math.max(4, W / 110), 0, 7); ctx.fill(); }
+}
+function finish() {
+  running = false; cancelAnimationFrame(raf);
+  const next = active().find(k => (today().reps[k] || 0) < S.prog[k]);
+  say(next ? 'Exercice terminé, bravo !' : 'Séance terminée ! Téléphone débloqué.');
+  beep(784, .1); setTimeout(() => beep(1046, .25), 120);
+  if (!next) unlockNow(false);
+  center(`<div class="t">${next ? 'Exercice terminé ! 💪' : 'Séance validée ! 🏆'}</div><p style="color:#ccc;margin-bottom:16px">${next ? 'Prochain : ' + EXERCISES[next].n : 'Tes applis sont débloquées jusqu’à minuit.'}</p>${next ? `<button class="btn pri" id="nextEx">Enchaîner : ${EXERCISES[next].n}</button><button class="btn" style="margin-top:10px" id="endS">Plus tard</button>` : `<button class="btn ok" id="endS">Débloquer mon téléphone</button>`}`);
+  if (next) $c('nextEx').onclick = () => { closeSession(true); startSession(next); };
+  $c('endS').onclick = () => closeSession();
+}
+function closeSession(keepCam) {
+  running = false; cancelAnimationFrame(raf);
+  if (!keepCam && stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  try { wake && wake.release(); } catch (e) {} wake = null;
+  if (!keepCam) { cam.classList.remove('on'); document.body.style.overflow = ''; }
+  render();
+}
+$c('camClose').onclick = () => closeSession();
+$c('camFlip').onclick = async () => { facing = facing === 'user' ? 'environment' : 'user'; try { await openCamera(); } catch (e) { toast('Impossible de changer de caméra'); } };
+$c('camVoice').onclick = () => { S.voice = !S.voice; save(); $c('camVoice').textContent = S.voice ? '🔊' : '🔇'; };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !cam.classList.contains('on')) render(); });
+
+render();
+</script>
+</body>
+</html>
